@@ -76,21 +76,43 @@ for line in lines:
 			#print("Operator")
 			func.append(operators.ops[line[0]])
 			line = line[1:]
+		elif line[0] in metas.metas:
+			# Match a meta
+			#print("Meta")
+			func.append(metas.metas[line[0]])
+			line = line[1:]
 		else:
 			#print("Other")
 			line = line[1:]
 
+	i = 0
+	while i < len(func):
+		if type(func[i]) == list:
+			if (func[i][1] == 1):
+				# If the meta act on 1 operator
+				if (i >= 1) and (type(func[i-1]) == operators.Operator):
+					func = func[:i-1]+[ operators.Operator(func[i-1].name+func[i][0], 0, (lambda op, meta: lambda stack: meta(stack, [op]) )(func[i-1], func[i][2]) ) ]+func[i+1:]
+			else:
+				# If it acts on 2 operators
+				if (i >= 2) and (type(func[i-1]) == operators.Operator) and (type(func[i-2]) == operators.Operator):
+					func = func[:i-2]+[ operators.Operator(func[i-2].name+func[i-1].name+func[i][0], 0, (lambda op1, op2, meta: lambda stack: meta(stack, [op1, op2]) )(func[i-2], func[i-1], func[i][2]) ) ]+func[i+1:]
+		i += 1
+
 	functions.append(func)
+
 
 
 ### MORE TESTING BELOW
 
 #print(functions)
 
-'''for op in functions[-1]:
+for op in functions[-1]:
 	op.execute(stack)
 
-print(stack)'''
+print(stack)
+
+print(functions[-1])
+
 
 #interpret(code, []) # Run the code starting with an empty stack
 
