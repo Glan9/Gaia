@@ -31,21 +31,10 @@ def closeArray(stack):
 
 # Parsing
 
-code = ''
-
-if len(sys.argv) > 1:
-	source = open(sys.argv[1], 'r', encoding='utf-8')
-	code = source.read()
-else:
-	sys.stderr.write("Error: No source file specified.\n")
-	exit(1)
-
-
-lines = code.split('\n')
-
-functions = []
-
-for line in lines:
+"""
+Break a line (as a string) down into operators
+"""
+def decompose(line):
 	func = []
 
 	while len(line) > 0:
@@ -72,13 +61,21 @@ for line in lines:
 			num = float(re.match("^-?(\d+(\.\d+)?|\.\d+)", line).group(0))
 			func.append(operators.Operator(str(num), 0, ( lambda x: lambda stack: stack.append(x) )(num) ))
 			line = re.sub("^-?(\d+(\.\d+)?|\.\d+)", '', line)
+		elif re.match("^⟨[^⟨]*?⟩", line):
+			# Match a monadic block
+			# TODO: This is extremely simplistic, needs to updated further
+			block = decompose(re.match("^⟨([^⟨]*?)⟩", line).group(1))
+			func.append(operators.Operator( re.match("^⟨([^⟨]*?)⟩", line).group(0), 1, (lambda block: lambda stack, z, mode: [stack.append(i) for i in runFunction([z], block)])(block) ))
+			line = re.sub("^⟨[^⟨]*?⟩", "", line)
+
+			# Also TODO: When finished, more or less copy/paste to make dyadic blocks/niladic blocks
 		elif line[0] == '[':
 			# Match the opening of an array
 			func.append(operators.Operator('[', 0, openArray))
 			line = line[1:]
 		elif line[0] == ']':
 			# Match the opening of an array
-			func.append(operators.Operator('[', 0, closeArray))
+			func.append(operators.Operator(']', 0, closeArray))
 			line = line[1:]
 		elif line[0] in operators.ops:
 			# Match an operator
@@ -107,21 +104,49 @@ for line in lines:
 					func = func[:i-2]+[ operators.Operator(func[i-2].name+func[i-1].name+func[i][0], 0, (lambda op1, op2, meta: lambda stack: meta(stack, [op1, op2]) )(func[i-2], func[i-1], func[i][2]) ) ]+func[i+1:]
 		i += 1
 
-	functions.append(func)
+	return func
+
+
+def runFunction(stack, func):
+	# This might be expanded later, or it might be this simple...
+	for op in func:
+		op.execute(stack)
+
+	return stack
+
+
+###########################
+
+code = ''
+
+if len(sys.argv) > 1:
+	source = open(sys.argv[1], 'r', encoding='utf-8')
+	code = source.read()
+else:
+	sys.stderr.write("Error: No source file specified.\n")
+	exit(1)
+
+
+lines = code.split('\n')
+
+functions = []
+
+for line in lines:
+	
+	functions.append(decompose(line))
 
 
 
 # Running
 
-for op in functions[-1]:
-	op.execute(stack)
+runFunction(stack, functions[-1])
 
 
 ### TESTING
 
 print(stack)
 
-print(functions[-1])
+#print(functions[-1])
 
 
 
