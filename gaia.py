@@ -12,18 +12,24 @@ strRegex = "“[^”]*?”"
 
 
 stack = []
+arrayMarkers = [] # Used to mark the positions of arrays being opened, with '['
+callStack = [1]   # Function call stack
 
-"""
-### TEST
-stack=[2, 3, 1]
+def openArray(stack):
+	arrayMarkers.append(len(stack))
 
-metas.metas['¡'][2](stack, [operators.ops['×']])
+def closeArray(stack):
+	height = 0 # The stack height of the start of the array
+	if len(arrayMarkers) > 0:
+		height = arrayMarkers.pop()
 
-print(stack)
-### TEST
-"""
+	temp = []
+	while len(stack)>height:
+		temp.insert(0, stack.pop())
+	stack.append(temp)
 
-# Running the program
+
+# Parsing
 
 code = ''
 
@@ -36,11 +42,6 @@ else:
 
 
 lines = code.split('\n')
-
-#print(lines)
-
-
-#line = lines[-1]
 
 functions = []
 
@@ -71,6 +72,14 @@ for line in lines:
 			num = float(re.match("^-?(\d+(\.\d+)?|\.\d+)", line).group(0))
 			func.append(operators.Operator(str(num), 0, ( lambda x: lambda stack: stack.append(x) )(num) ))
 			line = re.sub("^-?(\d+(\.\d+)?|\.\d+)", '', line)
+		elif line[0] == '[':
+			# Match the opening of an array
+			func.append(operators.Operator('[', 0, openArray))
+			line = line[1:]
+		elif line[0] == ']':
+			# Match the opening of an array
+			func.append(operators.Operator('[', 0, closeArray))
+			line = line[1:]
 		elif line[0] in operators.ops:
 			# Match an operator
 			#print("Operator")
@@ -102,19 +111,19 @@ for line in lines:
 
 
 
-### MORE TESTING BELOW
-
-#print(functions)
+# Running
 
 for op in functions[-1]:
 	op.execute(stack)
+
+
+### TESTING
 
 print(stack)
 
 print(functions[-1])
 
 
-#interpret(code, []) # Run the code starting with an empty stack
 
 
 
