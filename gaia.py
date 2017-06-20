@@ -13,7 +13,8 @@ strRegex = "“[^”]*?”"
 
 stack = []
 arrayMarkers = [] # Used to mark the positions of arrays being opened, with '['
-callStack = [1]   # Function call stack
+functions = []
+callStack = []   # Function call stack
 
 def openArray(stack):
 	arrayMarkers.append(len(stack))
@@ -61,14 +62,77 @@ def decompose(line):
 			num = float(re.match("^-?(\d+(\.\d+)?|\.\d+)", line).group(0))
 			func.append(operators.Operator(str(num), 0, ( lambda x: lambda stack: stack.append(x) )(num) ))
 			line = re.sub("^-?(\d+(\.\d+)?|\.\d+)", '', line)
-		elif re.match("^⟨[^⟨]*?⟩", line):
+		elif line[0] == "{":
+			# Match a "niladic" block
+			blockStr = ''
+			depth = 1
+			while len(line) > 0 and depth > 0:
+				line = line[1:]
+				if line[0] == '{':
+					depth += 1
+				elif line[0] == '}':
+					depth -= 1
+				blockStr += line[0]
+			blockStr = blockStr[:-1]
+			block = decompose(blockStr)
+			func.append(operators.Operator( '{'+blockStr+'}', 0, (lambda block: lambda stack: callStack.append(None) or runFunction(stack, block))(block) ))
+		elif line[0] == "⟨":
 			# Match a monadic block
-			# TODO: This is extremely simplistic, needs to updated further
-			block = decompose(re.match("^⟨([^⟨]*?)⟩", line).group(1))
-			func.append(operators.Operator( re.match("^⟨([^⟨]*?)⟩", line).group(0), 1, (lambda block: lambda stack, z, mode: [stack.append(i) for i in runFunction([z], block)])(block) ))
-			line = re.sub("^⟨[^⟨]*?⟩", "", line)
-
-			# Also TODO: When finished, more or less copy/paste to make dyadic blocks/niladic blocks
+			blockStr = ''
+			depth = 1
+			while len(line) > 0 and depth > 0:
+				line = line[1:]
+				if line[0] == '⟨':
+					depth += 1
+				elif line[0] == '⟩':
+					depth -= 1
+				blockStr += line[0]
+			blockStr = blockStr[:-1]
+			block = decompose(blockStr)
+			func.append(operators.Operator( '⟨'+blockStr+'⟩', 1, (lambda block: lambda stack, z, mode: callStack.append(None) or [ stack.append(i) for i in runFunction([z], block) ])(block) ))
+		elif line[0] == "⟪":
+			# Match a dyadic block
+			blockStr = ''
+			depth = 1
+			while len(line) > 0 and depth > 0:
+				line = line[1:]
+				if line[0] == '⟪':
+					depth += 1
+				elif line[0] == '⟫':
+					depth -= 1
+				blockStr += line[0]
+			blockStr = blockStr[:-1]
+			block = decompose(blockStr)
+			func.append(operators.Operator( '⟪'+blockStr+'⟫', 2, (lambda block: lambda stack, x, y, mode: callStack.append(None) or [ stack.append(i) for i in runFunction([x, y], block) ])(block) ))
+		elif line[0] in "⇑⇓⇐⇒↑↓←→⇈⇊⇇⇉":
+			if line[0] == '⇑':
+				# Call function above on whole stack
+				func.append(operators.Operator( '⇑', 0, lambda stack: callStack.append((callStack[-1]-1)%len(functions)) or runFunction(stack, functions[callStack[-1]]) ))
+			elif line[0] == '↑':
+				# Call function above as a monad
+				func.append(operators.Operator( '↑', 1, lambda stack, z, mode: callStack.append((callStack[-1]-1)%len(functions)) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]]) ] ))
+			elif line[0] == '⇈':
+				# Call function above as a dyad
+				func.append(operators.Operator( '⇈', 2, lambda stack, x, y, mode: callStack.append((callStack[-1]-1)%len(functions)) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]]) ] ))
+			elif line[0] == '⇓':
+				# Call function below on whole stack
+				func.append(operators.Operator( '⇓', 0, lambda stack: callStack.append((callStack[-1]+1)%len(functions)) or runFunction(stack, functions[callStack[-1]]) ))
+			elif line[0] == '↓':
+				# Call function below as a monad
+				func.append(operators.Operator( '↓', 1, lambda stack, z, mode: callStack.append((callStack[-1]+1)%len(functions)) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]]) ] ))
+			elif line[0] == '⇊':
+				# Call function below as a dyad
+				func.append(operators.Operator( '⇊', 2, lambda stack, x, y, mode: callStack.append((callStack[-1]+1)%len(functions)) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]]) ] ))
+			elif line[0] == '⇐':
+				# Call current function on whole stack
+				func.append(operators.Operator( '⇐', 0, lambda stack: callStack.append(callStack[-1]) or runFunction(stack, functions[callStack[-1]]) ))
+			elif line[0] == '←':
+				# Call current function as a monad
+				func.append(operators.Operator( '←', 1, lambda stack, z, mode: callStack.append(callStack[-1]) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]]) ] ))
+			elif line[0] == '⇇':
+				# Call current function as a dyad
+				func.append(operators.Operator( '⇇', 2, lambda stack, x, y, mode: callStack.append(callStack[-1]) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]]) ] ))
+			line = line[1:]
 		elif line[0] == '[':
 			# Match the opening of an array
 			func.append(operators.Operator('[', 0, openArray))
@@ -95,7 +159,7 @@ def decompose(line):
 	while i < len(func):
 		if type(func[i]) == list:
 			if (func[i][1] == 1):
-				# If the meta act on 1 operator
+				# If the meta acts on 1 operator
 				if (i >= 1) and (type(func[i-1]) == operators.Operator):
 					func = func[:i-1]+[ operators.Operator(func[i-1].name+func[i][0], 0, (lambda op, meta: lambda stack: meta(stack, [op]) )(func[i-1], func[i][2]) ) ]+func[i+1:]
 			else:
@@ -106,11 +170,19 @@ def decompose(line):
 
 	return func
 
+"""
+runFunction(stack, func)
 
+Runs a function on a stack, and returns the final stack.
+
+stack: The stack to run on
+func:  The function to run
+"""
 def runFunction(stack, func):
-	# This might be expanded later, or it might be this simple...
 	for op in func:
 		op.execute(stack)
+	
+	callStack.pop()
 
 	return stack
 
@@ -129,18 +201,19 @@ else:
 
 lines = code.split('\n')
 
-functions = []
+
 
 for line in lines:
-	
 	functions.append(decompose(line))
 
 
 
 # Running
 
-runFunction(stack, functions[-1])
+callStack.append(len(functions)-1)
+runFunction(stack, functions[callStack[-1]])
 
+#print([o.name for o in functions[callStack[-1]]])
 
 ### TESTING
 
