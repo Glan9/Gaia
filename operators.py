@@ -75,10 +75,10 @@ def dyadMode(x, y):
 
 
 def monadNotImplemented(mode, char):
-	raise Exception(["num", "str", "list"][mode-1]+" "+char+" not implemented")
+	raise NotImplementedError('('+["num", "str", "list"][mode-1]+") "+char+" not implemented")
 
 def dyadNotImplemented(mode, char):
-	raise Exception(["num", "str", "list"][(mode-1)//3]+", "+["num", "str", "list"][mode%3-1]+" "+char+" not implemented")
+	raise NotImplementedError('('+["num", "str", "list"][(mode-1)//3]+", "+["num", "str", "list"][mode%3-1]+") "+char+" not implemented")
 
 def getInput():
 	line = input().strip()
@@ -104,6 +104,17 @@ def colonOperator(stack, z, mode):
 	if mode > 0:   # same for all types...
 		stack.append(z)
 		stack.append(z)
+	else:
+		monadNotImplemented(mode, '')
+
+# l
+def lOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(len(str(z)))
+	elif mode == 2: # str
+		stack.append(len(z))
+	elif mode == 3: # list
+		stack.append(len(z))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -227,6 +238,7 @@ ops = {
 	'ø': Operator('ø', 0, emptySetOperator),
 	# Monads
 	':': Operator(':', 1, colonOperator),
+	'l': Operator('l', 1, lOperator),
 	'⌋': Operator('⌋', 1, floorOperator),
 	'⌉': Operator('⌉', 1, ceilOperator),
 	# Dyads

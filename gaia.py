@@ -7,8 +7,6 @@ import operators
 import metas
 
 
-numRegex = "-?(\d+(\.\d+)?|\.\d+)"
-strRegex = "“[^”]*?”"
 
 
 stack = []
@@ -31,6 +29,17 @@ def closeArray(stack):
 
 
 # Parsing
+
+"""
+Parse a number written in subscript digits and return the number.
+"""
+def parseSubscript(num):
+	result = 0
+	for d in num:
+		result *= 10
+		result += "₀₁₂₃₄₅₆₇₈₉".find(d)
+	return result
+
 
 """
 Break a line (as a string) down into operators
@@ -58,10 +67,21 @@ def decompose(line):
 			line = re.sub("^“([^”]*)(”|$)", '', line)
 		elif re.match("^-?(\d+(\.\d+)?|\.\d+)", line):
 			# Match a number literal
-			#print("Number")
-			num = float(re.match("^-?(\d+(\.\d+)?|\.\d+)", line).group(0))
-			func.append(operators.Operator(str(num), 0, ( lambda x: lambda stack: stack.append(x) )(num) ))
+			match = re.match("^-?(\d+(\.\d+)?|\.\d+)", line).group(0)
+			num = float(match)
+			func.append(operators.Operator(match, 0, ( lambda x: lambda stack: stack.append(x) )(num) ))
 			line = re.sub("^-?(\d+(\.\d+)?|\.\d+)", '', line)
+			if re.match('^[₀₁₂₃₄₅₆₇₈₉]+', line):
+				# Subscript numbers after number literals form another number literal 
+				# (so you can write two literals with no separator)
+				num = re.match("^[₀₁₂₃₄₅₆₇₈₉]+", line).group(0)
+				func.append(operators.Operator(num, 0, ( lambda x: lambda stack: stack.append(x) )(parseSubscript(num)) ))
+				line = re.sub("^[₀₁₂₃₄₅₆₇₈₉]+", '', line)
+		elif re.match('^[₀₁₂₃₄₅₆₇₈₉]+', line):
+			# Match a repetition meta
+			num = re.match("^[₀₁₂₃₄₅₆₇₈₉]+", line).group(0)
+			func.append([num, 1, (lambda n: lambda stack, ops: [ops[0].execute(stack) for i in range(n)])(parseSubscript(num))])
+			line = re.sub("^[₀₁₂₃₄₅₆₇₈₉]+", '', line)
 		elif line[0] == "{":
 			# Match a "niladic" block
 			blockStr = ''
@@ -180,7 +200,11 @@ func:  The function to run
 """
 def runFunction(stack, func):
 	for op in func:
-		op.execute(stack)
+		try:
+			op.execute(stack)
+		except Exception as error:
+			sys.stderr.write("Error while executing operator "+op.name+": "+str(error)+'\n')
+			exit(1)
 	
 	callStack.pop()
 
