@@ -45,6 +45,9 @@ class Operator(object):
 
 """ HELPER FUNCTIONS """
 
+def formatNum(num):
+	return int(num) if num == int(num) else num
+
 def dyadMode(x, y):
 	# Returns the mode the dyad should execute, based on the types of its arguments
 	tx = type(x)
@@ -146,18 +149,48 @@ def ceilOperator(stack, z, mode):
 
 # +
 def plusOperator(stack, x, y, mode):
-	if mode == 1 or mode == 5 or mode == 9:
+	if mode == 1:   # num, num
 		stack.append(x + y)
-	elif mode == 2:
-		stack.append(str(x) + y)
-	elif mode == 3:
+	elif mode == 2: # num, str
+		stack.append(str(formatNum(x)) + y)
+	elif mode == 3: # num, list
 		stack.append([x] + y)
-	elif mode == 4:
-		stack.append(x + str(y))
-	elif mode == 7:
+	elif mode == 4: # str, num
+		stack.append(x + str(formatNum(y)))
+	elif mode == 5: # str, str
+		stack.append(x + y)
+	elif mode == 7: # list, num
 		stack.append(x + [y])
+	elif mode == 9: # list, list
+		stack.append(x + y)
 	else:
 		dyadNotImplemented(mode, '+')
+
+# −
+def minusOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(x - y)
+	elif mode == 2: # num, str
+		stack.append()
+	elif mode == 3: # num, list
+		stack.append()
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append()
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		stack.append()
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		for i in y:
+			if i in x:
+				x.remove(i)
+		stack.append(x)
+	else:
+		dyadNotImplemented(mode, '')
 
 # ×
 def timesOperator(stack, x, y, mode):
@@ -182,8 +215,41 @@ def timesOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '×')
 
+# ÷
+def divisionOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(x / y)
+	elif mode == 2 or mode == 3 or mode == 4 or mode == 7: # num, str (2) or str, num (4) or num, list (3) or list, num (7)
+		n = x if mode == 2 or mode == 3 else y
+		s = y if mode == 2 or mode == 3 else x
 
+		n = int(n) # Takes an integer specifically as argument
+		if n > len(s) or n < 1:
+			raise ValueError(str(n)+" is not a valid number of splits for “"+s+"” (length "+str(len(s))+")")
 
+		cuts = [0]*n
+		result = []
+
+		for i in range(len(s)):
+			cuts[i%n] += 1
+
+		for cut in cuts:
+			result.append(s[:cut])
+			s = s[cut:]
+
+		stack.append(result)
+	elif mode == 5: # str, str
+		stack.append()
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		stack.append()
+	else:
+		dyadNotImplemented(mode, '')
+
+#stack.append([x[i:i+int(y)] for i in range(0, len(x), int(y))])
 """
 Blank operator function, just easy to copy-paste
 
@@ -243,6 +309,8 @@ ops = {
 	'⌉': Operator('⌉', 1, ceilOperator),
 	# Dyads
 	'+': Operator('+', 2, plusOperator),
-	'×': Operator('×', 2, timesOperator)
+	'−': Operator('−', 2, minusOperator),
+	'×': Operator('×', 2, timesOperator),
+	'÷': Operator('÷', 2, divisionOperator)
 
 }

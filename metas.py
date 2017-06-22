@@ -201,6 +201,68 @@ def mapList(stack, ops):
 		else:
 			raise TypeError("At least one argument must be a list")
 
+# #
+def search(stack, ops):
+	result = []
+	tempStack = []
+	i = 1
+
+	if ops[0].arity == 0:
+		raise SyntaxError("# can't be combined with niladic operator "+ops[0].name)
+
+	elif ops[0].arity == 1:
+		if len(stack) > 0:
+			z = stack.pop()
+		else:
+			z = operators.getInput()
+
+		if type(z) != float and type(z) != int:
+			raise TypeError("Argument must be a number")
+
+		while len(result) < int(z):
+			tempStack = [i]
+			ops[0].execute(tempStack)
+			if tempStack.pop():
+				result.append(i)
+			i += 1
+		stack.append(result)
+		
+	elif ops[0].arity == 2:
+		if len(stack) >= 2:
+			y = stack.pop()
+			x = stack.pop()
+		elif len(stack) == 1:
+			x = stack.pop()
+			y = operators.getInput()
+		else:
+			x = operators.getInput()
+			y = operators.getInput()
+
+		if type(x) == float or type(x) == int:
+			while len(result) < int(x):
+				tempStack = [i, y]
+				ops[0].execute(tempStack)
+				if tempStack.pop():
+					result.append(i)
+				i += 1
+			stack.append(result)
+		elif type(y) == float or type(y) == int:
+			while len(result) < int(y):
+				tempStack = [x, i]
+				ops[0].execute(tempStack)
+				if tempStack.pop():
+					result.append(i)
+				i += 1
+			stack.append(result)
+		else:
+			raise TypeError("At least one argument must be a number")
+
+# ∞
+def infiniteLoop(stack, ops):
+	while True:
+		ops[0].execute(stack)
+
+
 
 """
 METAS DICT
@@ -214,5 +276,7 @@ metas = {
 	'¡': ['¡', 1, ifFalse],
 	'⁇': ['⁇', 1, select],
 	'⁈': ['⁈', 1, reject],
-	'¦': ['¦', 1, mapList]
+	'¦': ['¦', 1, mapList],
+	'#': ['#', 1, search],
+	'∞': ['∞', 1, infiniteLoop]
 }
