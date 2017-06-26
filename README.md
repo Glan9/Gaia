@@ -8,7 +8,7 @@ Documentation is currently unavailable, because I haven't even designed the enti
 
 ## Basic Syntax
 
-Gaia is stack-based, so all operators and functions are written in postfix notation. There are four data types in Gaia: number, string, list. All operators do something different for each data type. For example, the operator `$`
+Gaia is stack-based, so all operators and functions are written in postfix notation. There are three data types in Gaia: number, string, list. All operators do something different for each data type. For example, the operator `$`
 
  - converts a number to a list of digits;
  - converts a string to a list of characters; or
