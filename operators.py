@@ -92,6 +92,25 @@ def getInput():
 	## TODO: Finish this function
 
 
+# Increments an alphabetic string to the next string, alphabetically
+def incrementWord(word):
+	if len(word) == 0:
+		return 'a'
+	else:
+		if word[-1] == 'z':
+			if len(word) == 1:
+				return 'aa'
+			else:
+				return incrementWord(word[:-1])+'a'
+		elif word[-1] == 'Z':
+			if len(word) == 1:
+				return 'AA'
+			else:
+				return incrementWord(word[:-1])+'A'
+		else:
+			return word[:-1]+chr(ord(word[-1])+1)
+
+
 """ OPERATOR FUNCTIONS """
 
 ''' NILADS '''
@@ -102,11 +121,50 @@ def emptySetOperator(stack):
 
 ''' MONADS '''
 
+# !
+def exclamationOperator(stack, z, mode):
+	if mode > 0:   # same for all types...
+		stack.append(1 if not z else 0)
+	else:
+		monadNotImplemented(mode, '')
+
+# $
+def dollarOperator(stack, z, mode):
+	if mode == 1:   # num
+		result = []
+		sign = -1 if z<0 else 1
+		z = abs(z)
+		while z != 0:
+			result.insert(0, (z % 10)*sign)
+			z //= 10
+		stack.append(result)
+	elif mode == 2: # str
+		stack.append(list(z))
+	elif mode == 3: # list
+		result = []
+		for i in z:
+			if type(i) == int or type(i) == float:
+				result.append(str(formatNum(i)))
+			elif type(i) == str:
+				result.append(z)
+			else:
+				dollarOperator(result, i, 3) # Push the result of recursively calling this on the sublist
+		stack.append(''.join(result))
+	else:
+		monadNotImplemented(mode, '')
+
 # :
 def colonOperator(stack, z, mode):
 	if mode > 0:   # same for all types...
 		stack.append(z)
 		stack.append(z)
+	else:
+		monadNotImplemented(mode, '')
+
+# ;
+def semicolonOperator(stack, z, mode):
+	if mode > 0:   # same for all types...
+		stack.append(stack[-2])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -118,6 +176,67 @@ def lOperator(stack, z, mode):
 		stack.append(len(z))
 	elif mode == 3: # list
 		stack.append(len(z))
+	else:
+		monadNotImplemented(mode, '')
+
+# _
+def underscoreOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(-z)
+	elif mode == 2: # str
+		stack.append()  # Not planned yet
+	elif mode == 3: # list
+		result = []
+		for i in z:
+			if type(i) == list:
+				# If the element is a list, recursively flatten it and append its elements
+				temp = []
+				underscoreOperator(temp, i, 3)
+				result += temp[0]
+			else:
+				# Otherwise just append that element
+				result.append(i)
+		stack.append(result)
+	else:
+		monadNotImplemented(mode, '')
+
+# …
+def lowEllipsisOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(list(range(int(z))))
+	elif mode == 2: # str
+		# First check to make sure its alphabetic
+		for c in z:
+			if c.lower() not in "abcdefghijklmnopqrstuvwxyz":
+				stack.append(z)
+				return
+
+		result = []
+		word = ''
+
+		while word.lower() != z.lower():
+			word = incrementWord(word)
+			result.append(word)
+
+		stack.append(result)
+	elif mode == 3: # list
+		stack.append([z[:i+1] for i in range(len(z))])
+	else:
+		monadNotImplemented(mode, '')
+
+# ┅
+def highEllipsisOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(list(range(int(z)+1))[1:])
+	elif mode == 2: # str
+		if len(z)==0:
+			raise ValueError("argument must be at least 1 character long")
+
+		end = z[0]
+
+		stack.append([chr(i) for i in range(ord(end)+1)])
+	elif mode == 3: # list
+		stack.append([z[-len(z)+i:] for i in range(len(z))])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -147,6 +266,29 @@ def ceilOperator(stack, z, mode):
 
 ''' DYADS '''
 
+# %
+def percentOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(x % y)
+	elif mode == 2: # num, str
+		stack.append()
+	elif mode == 3: # num, list
+		stack.append()
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append()
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		stack.append()
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		stack.append()
+	else:
+		dyadNotImplemented(mode, '')
+
 # +
 def plusOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
@@ -166,14 +308,80 @@ def plusOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '+')
 
-# −
-def minusOperator(stack, x, y, mode):
+# /
+def slashOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		stack.append(x - y)
+		stack.append(x // y)
+	elif mode == 2: # num, str
+		if x <= 0:
+			raise ValueError("invalid size for splitting: "+str(int(x)))
+		stack.append([y[i:i+int(x)] for i in range(0, len(y), int(x))])
+	elif mode == 3: # num, list
+		if x <= 0:
+			raise ValueError("invalid size for splitting: "+str(int(x)))
+		stack.append([y[i:i+int(x)] for i in range(0, len(y), int(x))])
+	elif mode == 4: # str, num
+		if y <= 0:
+			raise ValueError("invalid size for splitting: "+str(int(y)))
+		stack.append([x[i:i+int(y)] for i in range(0, len(x), int(y))])
+	elif mode == 5: # str, str
+		stack.append()
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		if y <= 0:
+			raise ValueError("invalid size for splitting: "+str(int(y)))
+		stack.append([x[i:i+int(y)] for i in range(0, len(x), int(y))])
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		stack.append()
+	else:
+		dyadNotImplemented(mode, '')
+
+# =
+def equalsOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(1 if x == y else 0)
+	elif mode == 2: # num, str
+		stack.append(y[(int(x)-1)%len(y)])
+	elif mode == 3: # num, list
+		stack.append(y[(int(x)-1)%len(y)])
+	elif mode == 4: # str, num
+		stack.append(x[(int(y)-1)%len(x)])
+	elif mode == 5: # str, str
+		stack.append(1 if x == y else 0)
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		stack.append(x[(int(y)-1)%len(x)])
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		stack.append(1 if x == y else 0)
+	else:
+		dyadNotImplemented(mode, '')
+
+# Y
+def YOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(x // y)
+		stack.append(x % y)
 	elif mode == 2: # num, str
 		stack.append()
 	elif mode == 3: # num, list
-		stack.append()
+		result = []
+		x = int(x)
+		if x < 1 or x > len(y):
+			raise ValueError("")
+		for i in range(x):
+			index = i
+			step = []
+			while index < len(y):
+				step.append(y[index])
+				index += x
+			result.append(step)
+		stack.append(result)
 	elif mode == 4: # str, num
 		stack.append()
 	elif mode == 5: # str, str
@@ -181,14 +389,20 @@ def minusOperator(stack, x, y, mode):
 	elif mode == 6: # str, list
 		stack.append()
 	elif mode == 7: # list, num
-		stack.append()
+		result = []
+		y = int(y)
+		for i in range(y):
+			index = i
+			step = []
+			while index < len(x):
+				step.append(x[index])
+				index += y
+			result.append(step)
+		stack.append(result)
 	elif mode == 8: # list, str
 		stack.append()
 	elif mode == 9: # list, list
-		for i in y:
-			if i in x:
-				x.remove(i)
-		stack.append(x)
+		stack.append()
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -225,7 +439,8 @@ def divisionOperator(stack, x, y, mode):
 
 		n = int(n) # Takes an integer specifically as argument
 		if n > len(s) or n < 1:
-			raise ValueError(str(n)+" is not a valid number of splits for “"+s+"” (length "+str(len(s))+")")
+			                                          # TODO make this stringRep(s) after I define a custom stringRep function
+			raise ValueError(str(n)+" is not a valid number of splits for "+s+" (length "+str(len(s))+")")
 
 		cuts = [0]*n
 		result = []
@@ -249,7 +464,35 @@ def divisionOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
-#stack.append([x[i:i+int(y)] for i in range(0, len(x), int(y))])
+# −
+def minusOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(x - y)
+	elif mode == 2: # num, str
+		stack.append()
+	elif mode == 3: # num, list
+		stack.append()
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append()
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		stack.append()
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		for i in y:
+			if i in x:
+				x.remove(i)
+		stack.append(x)
+	else:
+		dyadNotImplemented(mode, '')
+
+
+
+
 """
 Blank operator function, just easy to copy-paste
 
@@ -303,12 +546,22 @@ ops = {
 	# Nilads
 	'ø': Operator('ø', 0, emptySetOperator),
 	# Monads
+	'!': Operator('!', 1, exclamationOperator),
+	'$': Operator('$', 1, dollarOperator),
 	':': Operator(':', 1, colonOperator),
+	';': Operator(';', 1, semicolonOperator),
 	'l': Operator('l', 1, lOperator),
+	'_': Operator('_', 1, underscoreOperator),
+	'…': Operator('…', 1, lowEllipsisOperator),
+	'┅': Operator('┅', 1, highEllipsisOperator),
 	'⌋': Operator('⌋', 1, floorOperator),
 	'⌉': Operator('⌉', 1, ceilOperator),
 	# Dyads
+	'%': Operator('%', 2, percentOperator),
 	'+': Operator('+', 2, plusOperator),
+	'/': Operator('/', 2, slashOperator),
+	'=': Operator('=', 2, equalsOperator),
+	'Y': Operator('Y', 2, YOperator),
 	'−': Operator('−', 2, minusOperator),
 	'×': Operator('×', 2, timesOperator),
 	'÷': Operator('÷', 2, divisionOperator)

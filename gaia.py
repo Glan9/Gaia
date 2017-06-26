@@ -77,6 +77,11 @@ def decompose(line):
 				num = re.match("^[₀₁₂₃₄₅₆₇₈₉]+", line).group(0)
 				func.append(operators.Operator(num, 0, ( lambda x: lambda stack: stack.append(x) )(parseSubscript(num)) ))
 				line = re.sub("^[₀₁₂₃₄₅₆₇₈₉]+", '', line)
+		elif line[0] == "'":
+			if len(line) < 2:
+				raise SyntaxError("Unfinished character literal")
+			func.append(operators.Operator( line[:2], 0, (lambda c: lambda stack: stack.append(c))(line[1])))
+			line = line[2:]
 		elif re.match('^[₀₁₂₃₄₅₆₇₈₉]+', line):
 			# Match a repetition meta
 			num = re.match("^[₀₁₂₃₄₅₆₇₈₉]+", line).group(0)
