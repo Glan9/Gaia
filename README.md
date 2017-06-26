@@ -4,6 +4,8 @@ A work-in-progress golfing language inspired by [CJam](https://sourceforge.net/p
 
 Gaia is still very much incomplete. Currently it's more or less usable but still has a very limited set of operators and built-in functions.
 
+Documentation is currently unavailable, because I haven't even designed the entire spec yet.
+
 ## Basic Syntax
 
 Gaia is stack-based, so all operators and functions are written in postfix notation. There are four data types in Gaia: number, string, list. All operators do something different for each data type. For example, the operator `$`
