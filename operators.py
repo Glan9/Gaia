@@ -273,7 +273,7 @@ def percentOperator(stack, x, y, mode):
 	elif mode == 2: # num, str
 		stack.append()
 	elif mode == 3: # num, list
-		stack.append()
+		stack.append([y[i] for i in range(0, len(y), int(x))])
 	elif mode == 4: # str, num
 		stack.append()
 	elif mode == 5: # str, str
@@ -281,7 +281,7 @@ def percentOperator(stack, x, y, mode):
 	elif mode == 6: # str, list
 		stack.append()
 	elif mode == 7: # list, num
-		stack.append()
+		stack.append([x[i] for i in range(0, len(x), int(y))])
 	elif mode == 8: # list, str
 		stack.append()
 	elif mode == 9: # list, list

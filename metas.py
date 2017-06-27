@@ -63,7 +63,7 @@ def select(stack, ops):
 			z = operators.getInput()
 
 		if type(z) != list:
-			raise TypeError("Argument must be a list")
+			raise TypeError("argument must be a list")
 
 		for item in z:
 			tempStack = [item]
@@ -98,7 +98,7 @@ def select(stack, ops):
 					result.append(item)
 			stack.append(result)
 		else:
-			raise TypeError("At least one argument must be a list")
+			raise TypeError("at least one argument must be a list")
 
 # ⁈
 def reject(stack, ops):
@@ -115,7 +115,7 @@ def reject(stack, ops):
 			z = operators.getInput()
 
 		if type(z) != list:
-			raise TypeError("Argument must be a list")
+			raise TypeError("argument must be a list")
 
 		for item in z:
 			tempStack = [item]
@@ -150,7 +150,7 @@ def reject(stack, ops):
 					result.append(item)
 			stack.append(result)
 		else:
-			raise TypeError("At least one argument must be a list")
+			raise TypeError("at least one argument must be a list")
 
 # ¦
 def mapList(stack, ops):
@@ -167,7 +167,7 @@ def mapList(stack, ops):
 			z = operators.getInput()
 
 		if type(z) != list:
-			raise TypeError("Argument must be a list")
+			raise TypeError("argument must be a list")
 
 		for item in z:
 			tempStack = [item]
@@ -199,7 +199,7 @@ def mapList(stack, ops):
 				result += tempStack
 			stack.append(result)
 		else:
-			raise TypeError("At least one argument must be a list")
+			raise TypeError("at least one argument must be a list")
 
 # #
 def search(stack, ops):
@@ -217,7 +217,7 @@ def search(stack, ops):
 			z = operators.getInput()
 
 		if type(z) != float and type(z) != int:
-			raise TypeError("Argument must be a number")
+			raise TypeError("argument must be a number")
 
 		while len(result) < int(z):
 			tempStack = [i]
@@ -255,7 +255,7 @@ def search(stack, ops):
 				i += 1
 			stack.append(result)
 		else:
-			raise TypeError("At least one argument must be a number")
+			raise TypeError("at least one argument must be a number")
 
 # ∞
 def infiniteLoop(stack, ops):
