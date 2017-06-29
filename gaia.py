@@ -3,9 +3,10 @@
 import sys
 import re
 import math
+
 import operators
 import metas
-
+import utilities
 
 
 
@@ -49,10 +50,12 @@ def decompose(line):
 
 	while len(line) > 0:
 
-		if re.match("^((\\[“”]|[^“])*)”", line):
+		if re.match("^((\\[“”]|[^“])*)([”‘’„‟])", line):
 			# Match an unopened quote
 			#print("Unstarted quote")
-			string = re.match("^((\\[“”]|[^“])*)”", line).group(1)
+			match = re.match("^((\\[“”]|[^“])*)([”‘’„‟])", line)
+			string = match.group(1)
+			terminator = match.group(2)
 			func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(string) ))
 			line = re.sub("^((\\[“”]|[^“])*)”", '', line)
 		elif re.match("^“[^”]*(”|$)", line):
@@ -236,19 +239,16 @@ for line in lines:
 	functions.append(decompose(line))
 
 
-
 # Running
 
 callStack.append(len(functions)-1)
 runFunction(stack, functions[callStack[-1]])
 
-#print([o.name for o in functions[callStack[-1]]])
+print("" if len(stack)==0 else utilities.outputFormat(stack[-1]))
 
 ### TESTING
 
-print(stack)
-
-#print(functions[-1])
+#print(stack)
 
 
 

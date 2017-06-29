@@ -14,6 +14,7 @@ ops:   A list of operators supplied to this meta.
 """
 
 import operators
+import utilities
 
 
 # ?
@@ -21,7 +22,7 @@ def conditional(stack, ops):
 	if len(stack) > 0:
 		cond = stack.pop()
 	else:
-		cond = operators.getInput()
+		cond = utilities.getInput()
 
 	if cond:
 		ops[0].execute(stack)
@@ -33,7 +34,7 @@ def ifTrue(stack, ops):
 	if len(stack) > 0:
 		cond = stack.pop()
 	else:
-		cond = operators.getInput()
+		cond = utilities.getInput()
 
 	if cond:
 		ops[0].execute(stack)
@@ -43,7 +44,7 @@ def ifFalse(stack, ops):
 	if len(stack) > 0:
 		cond = stack.pop()
 	else:
-		cond = operators.getInput()
+		cond = utilities.getInput()
 
 	if not cond:
 		ops[0].execute(stack)
@@ -60,7 +61,7 @@ def select(stack, ops):
 		if len(stack) > 0:
 			z = stack.pop()
 		else:
-			z = operators.getInput()
+			z = utilities.getInput()
 
 		if type(z) != list:
 			raise TypeError("argument must be a list")
@@ -78,10 +79,10 @@ def select(stack, ops):
 			x = stack.pop()
 		elif len(stack) == 1:
 			x = stack.pop()
-			y = operators.getInput()
+			y = utilities.getInput()
 		else:
-			x = operators.getInput()
-			y = operators.getInput()
+			x = utilities.getInput()
+			y = utilities.getInput()
 
 		if type(x) == list:
 			for item in x:
@@ -112,7 +113,7 @@ def reject(stack, ops):
 		if len(stack) > 0:
 			z = stack.pop()
 		else:
-			z = operators.getInput()
+			z = utilities.getInput()
 
 		if type(z) != list:
 			raise TypeError("argument must be a list")
@@ -130,10 +131,10 @@ def reject(stack, ops):
 			x = stack.pop()
 		elif len(stack) == 1:
 			x = stack.pop()
-			y = operators.getInput()
+			y = utilities.getInput()
 		else:
-			x = operators.getInput()
-			y = operators.getInput()
+			x = utilities.getInput()
+			y = utilities.getInput()
 
 		if type(x) == list:
 			for item in x:
@@ -164,7 +165,7 @@ def mapList(stack, ops):
 		if len(stack) > 0:
 			z = stack.pop()
 		else:
-			z = operators.getInput()
+			z = utilities.getInput()
 
 		if type(z) != list:
 			raise TypeError("argument must be a list")
@@ -181,10 +182,10 @@ def mapList(stack, ops):
 			x = stack.pop()
 		elif len(stack) == 1:
 			x = stack.pop()
-			y = operators.getInput()
+			y = utilities.getInput()
 		else:
-			x = operators.getInput()
-			y = operators.getInput()
+			x = utilities.getInput()
+			y = utilities.getInput()
 
 		if type(x) == list:
 			for item in x:
@@ -214,7 +215,7 @@ def search(stack, ops):
 		if len(stack) > 0:
 			z = stack.pop()
 		else:
-			z = operators.getInput()
+			z = utilities.getInput()
 
 		if type(z) != float and type(z) != int:
 			raise TypeError("argument must be a number")
@@ -233,10 +234,10 @@ def search(stack, ops):
 			x = stack.pop()
 		elif len(stack) == 1:
 			x = stack.pop()
-			y = operators.getInput()
+			y = utilities.getInput()
 		else:
-			x = operators.getInput()
-			y = operators.getInput()
+			x = utilities.getInput()
+			y = utilities.getInput()
 
 		if type(x) == float or type(x) == int:
 			while len(result) < int(x):

@@ -4,6 +4,8 @@ import sys
 import re
 import math
 
+import utilities
+
 """
 OPERATORS
 
@@ -26,7 +28,7 @@ class Operator(object):
 			if len(stack) > 0:
 				z = stack.pop()
 			else:
-				z = getInput()
+				z = utilities.getInput()
 			mode = {int: 1, float: 1, str: 2, list: 3}[type(z)]
 			self.func(stack, z, mode)
 		elif self.arity == 2:
@@ -35,18 +37,15 @@ class Operator(object):
 				x = stack.pop()
 			elif len(stack) == 1:
 				x = stack.pop()
-				y = getInput()
+				y = utilities.getInput()
 			else:
-				x = getInput()
-				y = getInput()
+				x = utilities.getInput()
+				y = utilities.getInput()
 			self.func(stack, x, y, dyadMode(x,y))
 
 
 
 """ HELPER FUNCTIONS """
-
-def formatNum(num):
-	return int(num) if num == int(num) else num
 
 def dyadMode(x, y):
 	# Returns the mode the dyad should execute, based on the types of its arguments
@@ -82,14 +81,6 @@ def monadNotImplemented(mode, char):
 
 def dyadNotImplemented(mode, char):
 	raise NotImplementedError('('+["num", "str", "list"][(mode-1)//3]+", "+["num", "str", "list"][mode%3-1]+") "+char+" not implemented")
-
-def getInput():
-	line = input().strip()
-	if re.match("^-?(\d+(\.\d+)?|\.\d+)$", line):
-		return float(line)
-	else:
-		return line
-	## TODO: Finish this function
 
 
 # Increments an alphabetic string to the next string, alphabetically
@@ -165,6 +156,13 @@ def colonOperator(stack, z, mode):
 def semicolonOperator(stack, z, mode):
 	if mode > 0:   # same for all types...
 		stack.append(stack[-2])
+	else:
+		monadNotImplemented(mode, '')
+
+# i
+def iOperator(stack, z, mode):
+	if mode > 0:
+		stack.append(z)
 	else:
 		monadNotImplemented(mode, '')
 
@@ -273,7 +271,7 @@ def percentOperator(stack, x, y, mode):
 	elif mode == 2: # num, str
 		stack.append()
 	elif mode == 3: # num, list
-		stack.append([y[i] for i in range(0, len(y), int(x))])
+		stack.append(y[::int(x)])
 	elif mode == 4: # str, num
 		stack.append()
 	elif mode == 5: # str, str
@@ -281,7 +279,7 @@ def percentOperator(stack, x, y, mode):
 	elif mode == 6: # str, list
 		stack.append()
 	elif mode == 7: # list, num
-		stack.append([x[i] for i in range(0, len(x), int(y))])
+		stack.append(x[::int(y)])
 	elif mode == 8: # list, str
 		stack.append()
 	elif mode == 9: # list, list
@@ -373,7 +371,7 @@ def YOperator(stack, x, y, mode):
 		result = []
 		x = int(x)
 		if x < 1 or x > len(y):
-			raise ValueError("")
+			raise ValueError("invalid size for unzipping: "+str(x))
 		for i in range(x):
 			index = i
 			step = []
@@ -391,6 +389,8 @@ def YOperator(stack, x, y, mode):
 	elif mode == 7: # list, num
 		result = []
 		y = int(y)
+		if y < 1 or y > len(y):
+			raise ValueError("invalid size for unzipping "+str(y))
 		for i in range(y):
 			index = i
 			step = []
