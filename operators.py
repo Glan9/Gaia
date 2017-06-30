@@ -337,6 +337,29 @@ def slashOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
+# <
+def lessThanOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(x < y)
+	elif mode == 2: # num, str
+		stack.append()
+	elif mode == 3: # num, list
+		stack.append()
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append(x < y)
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		stack.append()
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		stack.append(x < y)
+	else:
+		dyadNotImplemented(mode, '')
+
 # =
 def equalsOperator(stack, x, y, mode):
 	if mode == 1:   # num, num

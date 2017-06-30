@@ -45,6 +45,6 @@ def outputFormat(value):
 				result += '“'+i+'”'
 			else:
 				result += str(formatNum(i))
-			result += ', '
-		result = result [:-2]+']'
+			result += ' '
+		result = result [:-1]+']'
 		return result
