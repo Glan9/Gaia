@@ -72,13 +72,13 @@ def decompose(line):
 			# Match a number literal
 			match = re.match("^-?(\d+(\.\d+)?|\.\d+)", line).group(0)
 			num = float(match)
-			func.append(operators.Operator(match, 0, ( lambda x: lambda stack: stack.append(x) )(num) ))
+			func.append(operators.Operator(match, 0, ( lambda x: lambda stack: stack.append(utilities.formatNum(x)) )(num) ))
 			line = re.sub("^-?(\d+(\.\d+)?|\.\d+)", '', line)
 			if re.match('^[₀₁₂₃₄₅₆₇₈₉]+', line):
 				# Subscript numbers after number literals form another number literal 
 				# (so you can write two literals with no separator)
 				num = re.match("^[₀₁₂₃₄₅₆₇₈₉]+", line).group(0)
-				func.append(operators.Operator(num, 0, ( lambda x: lambda stack: stack.append(x) )(parseSubscript(num)) ))
+				func.append(operators.Operator(num, 0, ( lambda x: lambda stack: stack.append(utilities.formatNum(x)) )(parseSubscript(num)) ))
 				line = re.sub("^[₀₁₂₃₄₅₆₇₈₉]+", '', line)
 		elif line[0] == "'":
 			if len(line) < 2:

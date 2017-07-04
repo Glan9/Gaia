@@ -110,6 +110,14 @@ def incrementWord(word):
 def emptySetOperator(stack):
 	stack.append([])
 
+# ¶
+def pilcrowOperator(stack):
+	stack.append('\n')
+
+# §
+def sectionOperator(stack):
+	stack.append(' ')
+
 ''' MONADS '''
 
 # !
@@ -135,7 +143,7 @@ def dollarOperator(stack, z, mode):
 		result = []
 		for i in z:
 			if type(i) == int or type(i) == float:
-				result.append(str(formatNum(i)))
+				result.append(str(utilities.formatNum(i)))
 			elif type(i) == str:
 				result.append(z)
 			else:
@@ -159,6 +167,23 @@ def semicolonOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# b
+def bOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append()
+	elif mode == 2: # str
+		if z == "":
+			stack.append("")
+		else:
+			stack.append(z + z[-2::-1])
+	elif mode == 3: # list
+		if z == []:
+			stack.append([])
+		else:
+			stack.append(z + z[-2::-1])
+	else:
+		monadNotImplemented(mode, '')
+
 # i
 def iOperator(stack, z, mode):
 	if mode > 0:
@@ -177,24 +202,25 @@ def lOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# n
+def nOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append()
+	elif mode == 2: # str
+		stack.append(z.split('\n'))
+	elif mode == 3: # list
+		stack.append('\n'.join(map(str, z)))
+	else:
+		monadNotImplemented(mode, '')
+
 # _
 def underscoreOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append(-z)
+		stack.append(utilities.formatNum(-z))
 	elif mode == 2: # str
 		stack.append()  # Not planned yet
 	elif mode == 3: # list
-		result = []
-		for i in z:
-			if type(i) == list:
-				# If the element is a list, recursively flatten it and append its elements
-				temp = []
-				underscoreOperator(temp, i, 3)
-				result += temp[0]
-			else:
-				# Otherwise just append that element
-				result.append(i)
-		stack.append(result)
+		stack.append(utilities.flatten(z))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -267,7 +293,7 @@ def ceilOperator(stack, z, mode):
 # %
 def percentOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		stack.append(x % y)
+		stack.append(utilities.formatNum(x % y))
 	elif mode == 2: # num, str
 		stack.append()
 	elif mode == 3: # num, list
@@ -287,16 +313,50 @@ def percentOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
+# *
+def asteriskOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(utilities.formatNum(x ** y))
+	elif mode == 2: # num, str
+		stack.append()
+	elif mode == 3: # num, list
+		stack.append()
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append()
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		if y == 0:
+			stack.append([])
+			return
+		elif y < 0:
+			raise ValueError("can't do Cartesian power with negative exponent")
+
+		start = [[i] for i in x]
+		result = start
+		for i in range(int(y)-1):
+			result = [i+j for i in result for j in start]
+
+		stack.append(result)
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		stack.append()
+	else:
+		dyadNotImplemented(mode, '')
+
 # +
 def plusOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		stack.append(x + y)
+		stack.append(utilities.formatNum(x + y))
 	elif mode == 2: # num, str
-		stack.append(str(formatNum(x)) + y)
+		stack.append(str(x) + y)
 	elif mode == 3: # num, list
 		stack.append([x] + y)
 	elif mode == 4: # str, num
-		stack.append(x + str(formatNum(y)))
+		stack.append(x + str(y))
 	elif mode == 5: # str, str
 		stack.append(x + y)
 	elif mode == 7: # list, num
@@ -309,7 +369,7 @@ def plusOperator(stack, x, y, mode):
 # /
 def slashOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		stack.append(x // y)
+		stack.append(utilities.formatNum(x // y))
 	elif mode == 2: # num, str
 		if x <= 0:
 			raise ValueError("invalid size for splitting: "+str(int(x)))
@@ -323,7 +383,10 @@ def slashOperator(stack, x, y, mode):
 			raise ValueError("invalid size for splitting: "+str(int(y)))
 		stack.append([x[i:i+int(y)] for i in range(0, len(x), int(y))])
 	elif mode == 5: # str, str
-		stack.append()
+		result = x.split(y)
+		while "" in result:
+			result.remove("")
+		stack.append(result)
 	elif mode == 6: # str, list
 		stack.append()
 	elif mode == 7: # list, num
@@ -340,23 +403,23 @@ def slashOperator(stack, x, y, mode):
 # <
 def lessThanOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		stack.append(x < y)
+		stack.append(1 if x < y else 0)
 	elif mode == 2: # num, str
-		stack.append()
+		stack.append(y[:x])
 	elif mode == 3: # num, list
-		stack.append()
+		stack.append(y[:x])
 	elif mode == 4: # str, num
-		stack.append()
+		stack.append(x[:y])
 	elif mode == 5: # str, str
-		stack.append(x < y)
+		stack.append(1 if x < y else 0)
 	elif mode == 6: # str, list
 		stack.append()
 	elif mode == 7: # list, num
-		stack.append()
+		stack.append(x[:y])
 	elif mode == 8: # list, str
 		stack.append()
 	elif mode == 9: # list, list
-		stack.append(x < y)
+		stack.append(1 if x < y else 0)
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -383,11 +446,34 @@ def equalsOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
+# >
+def greaterThanOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(1 if x > y else 0)
+	elif mode == 2: # num, str
+		stack.append(y[x:])
+	elif mode == 3: # num, list
+		stack.append(y[x:])
+	elif mode == 4: # str, num
+		stack.append(x[y:])
+	elif mode == 5: # str, str
+		stack.append(1 if x > y else 0)
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		stack.append(x[y:])
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		stack.append(1 if x > y else 0)
+	else:
+		dyadNotImplemented(mode, '')
+
 # Y
 def YOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		stack.append(x // y)
-		stack.append(x % y)
+		stack.append(utilities.formatNum(x // y))
+		stack.append(utilities.formatNum(x % y))
 	elif mode == 2: # num, str
 		stack.append()
 	elif mode == 3: # num, list
@@ -432,21 +518,25 @@ def YOperator(stack, x, y, mode):
 # ×
 def timesOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		stack.append(x * y)
+		stack.append(utilities.formatNum(x * y))
 	elif mode == 2: # num, str
-		stack.append(int(x) * y)
+		result = abs(int(x)) * y
+		stack.append(result[::-1] if x < 0 else result)
 	elif mode == 3: # num, list
-		stack.append(int(x) * y)
+		result = abs(int(x)) * y
+		stack.append(result[::-1] if x < 0 else result)
 	elif mode == 4: # str, num
-		stack.append(x * int(y))
-	#elif mode == 5: # str, str
-	#	dyadNotImplemented(mode, '×')
+		result = abs(int(y)) * x
+		stack.append(result[::-1] if y < 0 else result)
+	elif mode == 5: # str, str
+		stack.append([i+j for i in x for j in y])
 	elif mode == 6: # str, list
 		stack.append(x.join(map(str, y)))
 	elif mode == 7: # list, num
-		stack.append(x * int(y))
+		result = abs(int(y)) * x
+		stack.append(result[::-1] if y < 0 else result)
 	elif mode == 8: # list, str
-		stack.append(y.join(map(str, x)))
+		stack.append(y.join(map(str, x))) # TODO this is weird when the list has sublists
 	elif mode == 9: # list, list
 		stack.append([[i, j] for i in x for j in y])
 	else:
@@ -455,7 +545,7 @@ def timesOperator(stack, x, y, mode):
 # ÷
 def divisionOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		stack.append(x / y)
+		stack.append(utilities.formatNum(x / y))
 	elif mode == 2 or mode == 3 or mode == 4 or mode == 7: # num, str (2) or str, num (4) or num, list (3) or list, num (7)
 		n = x if mode == 2 or mode == 3 else y
 		s = y if mode == 2 or mode == 3 else x
@@ -477,7 +567,7 @@ def divisionOperator(stack, x, y, mode):
 
 		stack.append(result)
 	elif mode == 5: # str, str
-		stack.append()
+		stack.append(x.split(y))
 	elif mode == 6: # str, list
 		stack.append()
 	elif mode == 8: # list, str
@@ -490,24 +580,32 @@ def divisionOperator(stack, x, y, mode):
 # −
 def minusOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		stack.append(x - y)
+		stack.append(utilities.formatNum(x - y))
 	elif mode == 2: # num, str
 		stack.append()
 	elif mode == 3: # num, list
-		stack.append()
+		while x in y:
+			y.remove(x)
+		stack.append(y)
 	elif mode == 4: # str, num
 		stack.append()
 	elif mode == 5: # str, str
 		stack.append()
 	elif mode == 6: # str, list
-		stack.append()
+		while x in y:
+			y.remove(x)
+		stack.append(y)
 	elif mode == 7: # list, num
-		stack.append()
+		while y in x:
+			x.remove(y)
+		stack.append(x)
 	elif mode == 8: # list, str
-		stack.append()
+		while y in x:
+			x.remove(y)
+		stack.append(x)
 	elif mode == 9: # list, list
 		for i in y:
-			if i in x:
+			while i in x:
 				x.remove(i)
 		stack.append(x)
 	else:
@@ -568,11 +666,15 @@ Each value should be an Operator object
 ops = {
 	# Nilads
 	'ø': Operator('ø', 0, emptySetOperator),
+	'¶': Operator('¶', 0, pilcrowOperator),
+	'§': Operator('§', 0, sectionOperator),
 	# Monads
 	'!': Operator('!', 1, exclamationOperator),
 	'$': Operator('$', 1, dollarOperator),
 	':': Operator(':', 1, colonOperator),
 	';': Operator(';', 1, semicolonOperator),
+	'b': Operator('b', 1, bOperator),
+	'n': Operator('n', 1, nOperator),
 	'l': Operator('l', 1, lOperator),
 	'_': Operator('_', 1, underscoreOperator),
 	'…': Operator('…', 1, lowEllipsisOperator),
@@ -581,6 +683,7 @@ ops = {
 	'⌉': Operator('⌉', 1, ceilOperator),
 	# Dyads
 	'%': Operator('%', 2, percentOperator),
+	'*': Operator('*', 2, asteriskOperator),
 	'+': Operator('+', 2, plusOperator),
 	'/': Operator('/', 2, slashOperator),
 	'=': Operator('=', 2, equalsOperator),

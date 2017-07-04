@@ -3,6 +3,20 @@ import re
 
 codepage = """₀₁₂₃₄₅₆₇₈₉ₓ₌ₔ   ⟨⟩⟪⟫⇑⇓⇐⇒↑↓←→⇈⇊⇇⇉ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\n""" # TODO: finish code page
 
+
+def flatten(l):
+	result = []
+	for i in l:
+		if type(i) == list:
+			# If the element is a list, recursively flatten it and append its elements
+			result += flatten(i)
+		else:
+			# Otherwise just append that element
+			result.append(i)
+	return result
+
+
+
 def formatNum(num):
 	return int(num) if num == int(num) else num
 
@@ -33,7 +47,8 @@ def outputFormat(value):
 	if type(value) == int:
 		return str(value)
 	elif type(value) == float:
-		return str(formatNum(value))
+		#return str(formatNum(value))
+		return str(value)
 	elif type(value) == str:
 		return value
 	elif type(value) == list:
@@ -46,5 +61,5 @@ def outputFormat(value):
 			else:
 				result += str(formatNum(i))
 			result += ' '
-		result = result [:-1]+']'
+		result = re.sub(" ?$", "]", result)
 		return result
