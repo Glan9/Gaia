@@ -26,7 +26,7 @@ def getInput():
 		return float(line)
 	else:
 		return line
-	## TODO: Finish this function
+	## TODO: Finish this function (add list parsing?)
 
 def codepageEncode(code):
 	result = ""
@@ -47,8 +47,7 @@ def outputFormat(value):
 	if type(value) == int:
 		return str(value)
 	elif type(value) == float:
-		#return str(formatNum(value))
-		return str(value)
+		return str(formatNum(value))
 	elif type(value) == str:
 		return value
 	elif type(value) == list:

@@ -110,6 +110,8 @@ def incrementWord(word):
 def emptySetOperator(stack):
 	stack.append([])
 
+# empty string operator?
+
 # ¶
 def pilcrowOperator(stack):
 	stack.append('\n')
@@ -117,6 +119,50 @@ def pilcrowOperator(stack):
 # §
 def sectionOperator(stack):
 	stack.append(' ')
+
+# 
+def lowerlettersOperator(stack):
+	stack.append('abcdefghijklmnopqrstuvwxyz')
+
+# 
+def upperlettersOperator(stack):
+	stack.append('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+
+# 
+def vowelsOperator(stack):
+	stack.append('aeiou')
+
+# 
+def vowelsAltOperator(stack):
+	stack.append('aeiouy')
+
+# 
+def consonantsOperator(stack):
+	stack.append('bcdfghjklmnpqrstvwxyz')
+
+# 
+def consonantsAltOperator(stack):
+	stack.append('bcdfghjklmnpqrstvwxz')
+
+# 
+def digitsOperator(stack):
+	stack.append('0123456789')
+
+# 
+def qwertyOperator(stack):
+	stack.append(['qwertyuiop', 'asdfghjkl', 'zxcvbnm'])
+
+# 
+def tenOperator(stack):
+	stack.append(10)
+
+# 
+def hundredOperator(stack):
+	stack.append(100)
+
+
+# date/time oeprators, extensive like in EXP
+# timestamp (since epoch)
 
 ''' MONADS '''
 
@@ -210,6 +256,19 @@ def nOperator(stack, z, mode):
 		stack.append(z.split('\n'))
 	elif mode == 3: # list
 		stack.append('\n'.join(map(str, z)))
+	else:
+		monadNotImplemented(mode, '')
+
+# v
+def vOperator(stack, z, mode):
+	if mode == 1:   # num
+		sign = -1 if z < 0 else 1
+		z = abs(z)
+		stack.append() # TODO reverse numbers somehow, figure out exactly how it works
+	elif mode == 2: # str
+		stack.append(z[::-1])
+	elif mode == 3: # list
+		stack.append(z[::-1])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -674,8 +733,10 @@ ops = {
 	':': Operator(':', 1, colonOperator),
 	';': Operator(';', 1, semicolonOperator),
 	'b': Operator('b', 1, bOperator),
-	'n': Operator('n', 1, nOperator),
+	'i': Operator('i', 1, iOperator),
 	'l': Operator('l', 1, lOperator),
+	'n': Operator('n', 1, nOperator),
+	'v': Operator('v', 1, vOperator),
 	'_': Operator('_', 1, underscoreOperator),
 	'…': Operator('…', 1, lowEllipsisOperator),
 	'┅': Operator('┅', 1, highEllipsisOperator),
