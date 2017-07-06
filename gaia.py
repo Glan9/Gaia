@@ -41,6 +41,25 @@ def parseSubscript(num):
 		result += "₀₁₂₃₄₅₆₇₈₉".find(d)
 	return result
 
+"""
+Returns the lambda function for a meta combined with one or two operators.
+
+meta:   The function of the meta
+arity:  The arity of the meta (not number of operators)
+op1:    First operator
+op2:    Second operator (optional)
+
+"""
+def determineMetaCallStyle(meta, arity, op1, op2 = None):
+	ops = list(filter(lambda o:o!=None, [op1, op2]))
+
+	if arity == 0:
+		return lambda stack: meta(stack, ops)
+	elif arity == 1:
+		return lambda stack, z, mode: meta(stack, ops, mode, z)
+	elif arity == 2:
+		return lambda stack, x, y, mode: meta(stack, ops, mode, x, y)
+
 
 """
 Break a line (as a string) down into operators
@@ -189,11 +208,14 @@ def decompose(line):
 			if (func[i][1] == 1):
 				# If the meta acts on 1 operator
 				if (i >= 1) and (type(func[i-1]) == operators.Operator):
-					func = func[:i-1]+[ operators.Operator(func[i-1].name+func[i][0], 0, (lambda op, meta: lambda stack: meta(stack, [op]) )(func[i-1], func[i][2]) ) ]+func[i+1:]
+					arity = func[i-1].arity if func[i][2] == -1 else func[i][2]
+
+					func = func[:i-1]+[ operators.Operator(func[i-1].name+func[i][0], arity, determineMetaCallStyle(func[i][3], arity, func[i-1]) ) ]+func[i+1:]
 			else:
 				# If it acts on 2 operators
 				if (i >= 2) and (type(func[i-1]) == operators.Operator) and (type(func[i-2]) == operators.Operator):
-					func = func[:i-2]+[ operators.Operator(func[i-2].name+func[i-1].name+func[i][0], 0, (lambda op1, op2, meta: lambda stack: meta(stack, [op1, op2]) )(func[i-2], func[i-1], func[i][2]) ) ]+func[i+1:]
+					arity = func[i][2]
+					func = func[:i-2]+[ operators.Operator(func[i-2].name+func[i-1].name+func[i][0], arity, determineMetaCallStyle(func[i][3], arity, func[i-2], func[i-1]) ) ]+func[i+1:]
 		i += 1
 
 	return func

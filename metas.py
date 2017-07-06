@@ -18,39 +18,24 @@ import utilities
 
 
 # ?
-def conditional(stack, ops):
-	if len(stack) > 0:
-		cond = stack.pop()
-	else:
-		cond = utilities.getInput()
-
-	if cond:
+def conditional(stack, ops, mode = None, x = None, y = None):
+	if x:
 		ops[0].execute(stack)
 	else:
 		ops[1].execute(stack)
 
 # ¿
-def ifTrue(stack, ops):
-	if len(stack) > 0:
-		cond = stack.pop()
-	else:
-		cond = utilities.getInput()
-
-	if cond:
+def ifTrue(stack, ops, mode = None, x = None, y = None):
+	if x:
 		ops[0].execute(stack)
 
 # ¡
-def ifFalse(stack, ops):
-	if len(stack) > 0:
-		cond = stack.pop()
-	else:
-		cond = utilities.getInput()
-
-	if not cond:
+def ifFalse(stack, ops, mode = None, x = None, y = None):
+	if not x:
 		ops[0].execute(stack)
 
 # ⁇
-def select(stack, ops):
+def select(stack, ops, mode = None, x = None, y = None):
 	result = []
 	tempStack = []
 
@@ -58,15 +43,12 @@ def select(stack, ops):
 		raise SyntaxError("⁇ can't be combined with niladic operator "+ops[0].name)
 
 	elif ops[0].arity == 1:
-		if len(stack) > 0:
-			z = stack.pop()
-		else:
-			z = utilities.getInput()
 
-		if type(z) != list:
+		if mode != 3:
+			# if x is not a list
 			raise TypeError("argument must be a list")
 
-		for item in z:
+		for item in x:
 			tempStack = [item]
 			ops[0].execute(tempStack)
 			if tempStack.pop():
@@ -74,24 +56,17 @@ def select(stack, ops):
 		stack.append(result)
 
 	elif ops[0].arity == 2:
-		if len(stack) >= 2:
-			y = stack.pop()
-			x = stack.pop()
-		elif len(stack) == 1:
-			x = stack.pop()
-			y = utilities.getInput()
-		else:
-			x = utilities.getInput()
-			y = utilities.getInput()
 
-		if type(x) == list:
+		if mode == 7 or mode == 8 or mode == 9:
+			# if x is a list
 			for item in x:
 				tempStack = [item, y]
 				ops[0].execute(tempStack)
 				if tempStack.pop():
 					result.append(item)
 			stack.append(result)
-		elif type(y) == list:
+		elif mode == 3 or mode == 6:
+			# if y is a list
 			for item in y:
 				tempStack = [x, item]
 				ops[0].execute(tempStack)
@@ -102,7 +77,7 @@ def select(stack, ops):
 			raise TypeError("at least one argument must be a list")
 
 # ⁈
-def reject(stack, ops):
+def reject(stack, ops, mode = None, x = None, y = None):
 	result = []
 	tempStack = []
 
@@ -110,15 +85,12 @@ def reject(stack, ops):
 		raise SyntaxError("⁈ can't be combined with niladic operator "+ops[0].name)
 
 	elif ops[0].arity == 1:
-		if len(stack) > 0:
-			z = stack.pop()
-		else:
-			z = utilities.getInput()
 
-		if type(z) != list:
+		if mode != 3:
+			# if x is not a list
 			raise TypeError("argument must be a list")
 
-		for item in z:
+		for item in x:
 			tempStack = [item]
 			ops[0].execute(tempStack)
 			if not tempStack.pop():
@@ -126,24 +98,17 @@ def reject(stack, ops):
 		stack.append(result)
 		
 	elif ops[0].arity == 2:
-		if len(stack) >= 2:
-			y = stack.pop()
-			x = stack.pop()
-		elif len(stack) == 1:
-			x = stack.pop()
-			y = utilities.getInput()
-		else:
-			x = utilities.getInput()
-			y = utilities.getInput()
 
-		if type(x) == list:
+		if mode == 7 or mode == 8 or mode == 9:
+			# if x is a list
 			for item in x:
 				tempStack = [item, y]
 				ops[0].execute(tempStack)
 				if not tempStack.pop():
 					result.append(item)
 			stack.append(result)
-		elif type(y) == list:
+		elif mode == 3 or mode == 6:
+			# if y is a list
 			for item in y:
 				tempStack = [x, item]
 				ops[0].execute(tempStack)
@@ -154,7 +119,7 @@ def reject(stack, ops):
 			raise TypeError("at least one argument must be a list")
 
 # ¦
-def mapList(stack, ops):
+def mapList(stack, ops, mode = None, x = None, y = None):
 	result = []
 	tempStack = []
 
@@ -162,38 +127,28 @@ def mapList(stack, ops):
 		raise SyntaxError("¦ can't be combined with niladic operator "+ops[0].name)
 
 	elif ops[0].arity == 1:
-		if len(stack) > 0:
-			z = stack.pop()
-		else:
-			z = utilities.getInput()
 
-		if type(z) != list:
+		if mode != 3:
+			# If x is not a list
 			raise TypeError("argument must be a list")
 
-		for item in z:
+		for item in x:
 			tempStack = [item]
 			ops[0].execute(tempStack)
 			result += tempStack
 		stack.append(result)
 		
 	elif ops[0].arity == 2:
-		if len(stack) >= 2:
-			y = stack.pop()
-			x = stack.pop()
-		elif len(stack) == 1:
-			x = stack.pop()
-			y = utilities.getInput()
-		else:
-			x = utilities.getInput()
-			y = utilities.getInput()
 
-		if type(x) == list:
+		if mode == 7 or mode == 8 or mode == 9:
+			# if x is a list
 			for item in x:
 				tempStack = [item, y]
 				ops[0].execute(tempStack)
 				result += tempStack
 			stack.append(result)
-		elif type(y) == list:
+		elif mode == 3 or mode == 6:
+			# if y is a list
 			for item in y:
 				tempStack = [x, item]
 				ops[0].execute(tempStack)
@@ -203,7 +158,7 @@ def mapList(stack, ops):
 			raise TypeError("at least one argument must be a list")
 
 # #
-def search(stack, ops):
+def search(stack, ops, mode = None, x = None, y = None):
 	result = []
 	tempStack = []
 	i = 1
@@ -212,15 +167,12 @@ def search(stack, ops):
 		raise SyntaxError("# can't be combined with niladic operator "+ops[0].name)
 
 	elif ops[0].arity == 1:
-		if len(stack) > 0:
-			z = stack.pop()
-		else:
-			z = utilities.getInput()
 
-		if type(z) != float and type(z) != int:
+		if mode != 1:
+			# if x is not a number
 			raise TypeError("argument must be a number")
 
-		while len(result) < int(z):
+		while len(result) < int(x):
 			tempStack = [i]
 			ops[0].execute(tempStack)
 			if tempStack.pop():
@@ -229,17 +181,9 @@ def search(stack, ops):
 		stack.append(result)
 		
 	elif ops[0].arity == 2:
-		if len(stack) >= 2:
-			y = stack.pop()
-			x = stack.pop()
-		elif len(stack) == 1:
-			x = stack.pop()
-			y = utilities.getInput()
-		else:
-			x = utilities.getInput()
-			y = utilities.getInput()
 
-		if type(x) == float or type(x) == int:
+		if mode == 1 or mode == 2 or mode == 3:
+			# if x is a number
 			while len(result) < int(x):
 				tempStack = [i, y]
 				ops[0].execute(tempStack)
@@ -247,7 +191,8 @@ def search(stack, ops):
 					result.append(i)
 				i += 1
 			stack.append(result)
-		elif type(y) == float or type(y) == int:
+		elif mode == 4 or mode == 7:
+			# if y is a number
 			while len(result) < int(y):
 				tempStack = [x, i]
 				ops[0].execute(tempStack)
@@ -259,7 +204,7 @@ def search(stack, ops):
 			raise TypeError("at least one argument must be a number")
 
 # ∞
-def infiniteLoop(stack, ops):
+def infiniteLoop(stack, ops, mode = None, x = None, y = None):
 	while True:
 		ops[0].execute(stack)
 
@@ -268,16 +213,19 @@ def infiniteLoop(stack, ops):
 """
 METAS DICT
 
-Each value should be an array of [symbol, #operators, function]
+Each value should be an array of [symbol, #operators, arity, function]
+
+Arity is either fixed (i.e. 1 for things like conditional), or -1 if the arity is equal to the operator's arity (e.g. for map)
+
 """
 
 metas = {
-	'?': ['?', 2, conditional],
-	'¿': ['¿', 1, ifTrue],
-	'¡': ['¡', 1, ifFalse],
-	'⁇': ['⁇', 1, select],
-	'⁈': ['⁈', 1, reject],
-	'¦': ['¦', 1, mapList],
-	'#': ['#', 1, search],
-	'∞': ['∞', 1, infiniteLoop]
+	'?': ['?', 2, 1, conditional],
+	'¿': ['¿', 1, 1, ifTrue],
+	'¡': ['¡', 1, 1, ifFalse],
+	'⁇': ['⁇', 1, -1, select],
+	'⁈': ['⁈', 1, -1, reject],
+	'¦': ['¦', 1, -1, mapList],
+	'#': ['#', 1, -1, search],
+	'∞': ['∞', 1, 0, infiniteLoop]
 }
