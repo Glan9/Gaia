@@ -107,7 +107,7 @@ def decompose(line):
 		elif re.match('^[₀₁₂₃₄₅₆₇₈₉]+', line):
 			# Match a repetition meta
 			num = re.match("^[₀₁₂₃₄₅₆₇₈₉]+", line).group(0)
-			func.append([num, 1, (lambda n: lambda stack, ops: [ops[0].execute(stack) for i in range(n)])(parseSubscript(num))])
+			func.append([num, 1, 0, (lambda n: lambda stack, ops, mode=None, x=None, y=None: [ops[0].execute(stack) for i in range(n)])(parseSubscript(num))])
 			line = re.sub("^[₀₁₂₃₄₅₆₇₈₉]+", '', line)
 		elif line[0] == "{":
 			# Match a "niladic" block

@@ -203,6 +203,32 @@ def search(stack, ops, mode = None, x = None, y = None):
 		else:
 			raise TypeError("at least one argument must be a number")
 
+# †
+def vectorize(stack, ops, mode = None, x = None, y = None):
+	if mode != 9:
+		raise TypeError("both arguments must be list in order to vectorize")
+
+	if ops[0].arity != 2:
+		raise SyntaxError("† can only be combined with a dyad")
+
+	result = []
+	tempStack = []
+
+	l = min(len(x), len(y))
+
+	for i in range(l):
+		tempStack = [x[i], y[i]]
+		ops[0].execute(tempStack)
+		result += tempStack
+
+	result += x[l:] + y[l:]
+
+	stack.append(result)
+
+
+
+
+
 # ∞
 def infiniteLoop(stack, ops, mode = None, x = None, y = None):
 	while True:
@@ -227,5 +253,6 @@ metas = {
 	'⁈': ['⁈', 1, -1, reject],
 	'¦': ['¦', 1, -1, mapList],
 	'#': ['#', 1, -1, search],
+	'†': ['†', 1, 2, vectorize],
 	'∞': ['∞', 1, 0, infiniteLoop]
 }

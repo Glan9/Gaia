@@ -23,7 +23,7 @@ def formatNum(num):
 def getInput():
 	line = input().strip()
 	if re.match("^-?(\d+(\.\d+)?|\.\d+)$", line):
-		return float(line)
+		return formatNum(float(line))
 	else:
 		return line
 	## TODO: Finish this function (add list parsing?)

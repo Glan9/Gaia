@@ -198,6 +198,30 @@ def dollarOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# (
+def leftParenthesisOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(z-1)
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		if len(z) > 0:
+			stack.append(z[0])
+	else:
+		monadNotImplemented(mode, '')
+
+# )
+def rightParenthesisOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(z+1)
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		if len(z) > 0:
+			stack.append(z[-1])
+	else:
+		monadNotImplemented(mode, '')
+
 # :
 def colonOperator(stack, z, mode):
 	if mode > 0:   # same for all types...
@@ -264,7 +288,7 @@ def vOperator(stack, z, mode):
 	if mode == 1:   # num
 		sign = -1 if z < 0 else 1
 		z = abs(z)
-		stack.append() # TODO reverse numbers somehow, figure out exactly how it works
+		stack.append(sign*utilities.formatNum(float(str(z)[::-1])))
 	elif mode == 2: # str
 		stack.append(z[::-1])
 	elif mode == 3: # list
@@ -323,6 +347,17 @@ def highEllipsisOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# Σ
+def sigmaOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append()
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		stack.append()
+	else:
+		monadNotImplemented(mode, '')
+
 # ⌋
 def floorOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -331,6 +366,7 @@ def floorOperator(stack, z, mode):
 		stack.append(z.lower())
 	elif mode == 3: # list
 		if len(z) > 0:
+			stack.append(z[1:])
 			stack.append(z[0])
 	else:
 		monadNotImplemented(mode, '')
@@ -343,6 +379,7 @@ def ceilOperator(stack, z, mode):
 		stack.append(z.upper())
 	elif mode == 3: # list
 		if len(z) > 0:
+			stack.append(z[:-1])
 			stack.append(z[-1])
 	else:
 		monadNotImplemented(mode, '')
@@ -670,8 +707,36 @@ def minusOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
+# ∈
+def elementOfOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(1 if x % y == 0 else 0)
+	elif mode == 2: # num, str
+		stack.append()
+	elif mode == 3: # num, list
+		stack.append(1 if x in y else 0)
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append()
+	elif mode == 6: # str, list
+		stack.append(1 if x in y else 0)
+	elif mode == 7: # list, num
+		stack.append(1 if y in x else 0)
+	elif mode == 8: # list, str
+		stack.append(1 if y in x else 0)
+	elif mode == 9: # list, list
+		stack.append(1 if x in y else 0)
+	else:
+		dyadNotImplemented(mode, '')
 
-
+# ¤
+def currencyOperator(stack, x, y, mode):
+	if mode > 0:   # any types...
+		stack.append(y)
+		stack.append(x)
+	else:
+		dyadNotImplemented(mode, '')
 
 """
 Blank operator function, just easy to copy-paste
@@ -730,6 +795,8 @@ ops = {
 	# Monads
 	'!': Operator('!', 1, exclamationOperator),
 	'$': Operator('$', 1, dollarOperator),
+	'(': Operator('(', 1, leftParenthesisOperator),
+	')': Operator(')', 1, rightParenthesisOperator),
 	':': Operator(':', 1, colonOperator),
 	';': Operator(';', 1, semicolonOperator),
 	'b': Operator('b', 1, bOperator),
@@ -751,6 +818,8 @@ ops = {
 	'Y': Operator('Y', 2, YOperator),
 	'−': Operator('−', 2, minusOperator),
 	'×': Operator('×', 2, timesOperator),
-	'÷': Operator('÷', 2, divisionOperator)
+	'÷': Operator('÷', 2, divisionOperator),
+	'∈': Operator('∈', 2, elementOfOperator),
+	'¤': Operator('¤', 2, currencyOperator)
 
 }
