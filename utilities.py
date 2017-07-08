@@ -62,3 +62,41 @@ def outputFormat(value):
 			result += ' '
 		result = re.sub(" ?$", "]", result)
 		return result
+
+
+def castToNumber(v):
+	if type(v) == int or type(v) == float:
+		return formatNum(v)
+	elif type(v) == str:
+		match = re.match("^\s*((-|\+)?(\d+(\.\d+)?|\.\d+))", v)
+
+		return 0 if match == None else formatNum(float(match.group(1)))
+	elif type(v) == list:
+		result = 0
+		v = v[::-1]
+		while v:
+			result *= 10
+			result += castToNumber(v.pop())
+		return result
+
+def castToString(v):
+	if type(v) == int or type(v) == float:
+		return str(formatNum(v))
+	elif type(v) == str:
+		return v
+	elif type(v) == list:
+		newList = [castToString(item) for item in v]
+		return "".join(newList)
+
+def castToList(v):
+	if type(v) == int or type(v) == float:
+		sign = -1 if v < 0 else 1
+		v = abs(int(v))
+
+		return list(map(lambda x:x*sign, list(range(1, v+1) if v>0 else [])))
+
+	elif type(v) == str:
+		return list(v)
+	elif type(v) == list:
+		return v
+
