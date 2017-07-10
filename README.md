@@ -6,6 +6,12 @@ Gaia is still very much incomplete. Currently it's more or less usable but still
 
 Documentation is currently unavailable, because I haven't even designed the entire spec yet.
 
+## Running Gaia
+
+Download the four `.py` files, and run `python gaia.py <flags, optionally> <filename>`.
+
+Currently the only flag supported is `-e`, to run using the codepage encoding.
+
 ## Basic Syntax
 
 Gaia is stack-based, so all operators and functions are written in postfix notation. There are three data types in Gaia: number, string, list. All operators do something different for each data type. For example, the operator `$`
