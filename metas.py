@@ -74,7 +74,14 @@ def select(stack, ops, mode = None, x = None, y = None):
 					result.append(item)
 			stack.append(result)
 		else:
-			raise TypeError("at least one argument must be a list")
+			# if neither is a list
+			x = utilities.castToList(x)
+			for item in x:
+				tempStack = [item, y]
+				ops[0].execute(tempStack)
+				if tempStack.pop():
+					result.append(item)
+			stack.append(result)
 
 # ⁈
 def reject(stack, ops, mode = None, x = None, y = None):
@@ -116,7 +123,14 @@ def reject(stack, ops, mode = None, x = None, y = None):
 					result.append(item)
 			stack.append(result)
 		else:
-			raise TypeError("at least one argument must be a list")
+			# if neither is a list
+			x = utilities.castToList(x)
+			for item in x:
+				tempStack = [item, y]
+				ops[0].execute(tempStack)
+				if not tempStack.pop():
+					result.append(item)
+			stack.append(result)
 
 # ¦
 def mapList(stack, ops, mode = None, x = None, y = None):
@@ -155,7 +169,13 @@ def mapList(stack, ops, mode = None, x = None, y = None):
 				result += tempStack
 			stack.append(result)
 		else:
-			raise TypeError("at least one argument must be a list")
+			# if neither is a list
+			x = utilities.castToList(x)
+			for item in x:
+				tempStack = [item, y]
+				ops[0].execute(tempStack)
+				result += tempStack
+			stack.append(result)
 
 # #
 def search(stack, ops, mode = None, x = None, y = None):
@@ -201,32 +221,71 @@ def search(stack, ops, mode = None, x = None, y = None):
 				i += 1
 			stack.append(result)
 		else:
-			raise TypeError("at least one argument must be a number")
+			# if neither is a number
+			x = utilities.castToNumber(x)
+			while len(result) < int(x):
+				tempStack = [i, y]
+				ops[0].execute(tempStack)
+				if tempStack.pop():
+					result.append(i)
+				i += 1
+			stack.append(result)
 
 # †
 def vectorize(stack, ops, mode = None, x = None, y = None):
-	if mode != 9:
-		raise TypeError("both arguments must be list in order to vectorize")
 
-	if ops[0].arity != 2:
-		raise SyntaxError("† can only be combined with a dyad")
+	if ops[0].arity == 0:
+		raise SyntaxError("† can't be paired with a nilad")
 
-	result = []
-	tempStack = []
-
-	l = min(len(x), len(y))
-
-	for i in range(l):
-		tempStack = [x[i], y[i]]
+	if ops[0].arity == 1:
+		tempStack = [x]
 		ops[0].execute(tempStack)
-		result += tempStack
+		stack += tempStack
 
-	result += x[l:] + y[l:]
+		tempStack = [y]
+		ops[0].execute(tempStack)
+		stack += tempStack
 
-	stack.append(result)
+	if ops[0].arity == 2:
+		result = []
+		tempStack = []
+
+		x = utilities.castToList(x)
+		y = utilities.castToList(y)
+
+		l = min(len(x), len(y))
+
+		for i in range(l):
+			tempStack = [x[i], y[i]]
+			ops[0].execute(tempStack)
+			result += tempStack
+
+		result += x[l:] + y[l:]
+
+		stack.append(result)
 
 
+# ↺
+def whileLoop(stack, ops, mode = None, x = None, y = None):
+	
+	while True:
+		ops[0].execute(stack)
 
+		if stack.pop():
+			ops[1].execute(stack)
+		else:
+			break
+
+# ↻
+def untilLoop(stack, ops, mode = None, x = None, y = None):
+	
+	while True:
+		ops[0].execute(stack)
+
+		if not stack.pop():
+			ops[1].execute(stack)
+		else:
+			break
 
 
 # ∞
@@ -254,5 +313,7 @@ metas = {
 	'¦': ['¦', 1, -1, mapList],
 	'#': ['#', 1, -1, search],
 	'†': ['†', 1, 2, vectorize],
+	'↺': ['↺', 2, 0, whileLoop],
+	'↻': ['↻', 2, 0, untilLoop],
 	'∞': ['∞', 1, 0, infiniteLoop]
 }

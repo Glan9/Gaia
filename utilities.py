@@ -56,7 +56,7 @@ def outputFormat(value):
 			if type(i) == list:
 				result += outputFormat(i)
 			elif type(i) == str:
-				result += '“'+i+'”'
+				result += '"'+i+'"'
 			else:
 				result += str(formatNum(i))
 			result += ' '

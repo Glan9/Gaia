@@ -160,6 +160,14 @@ def tenOperator(stack):
 def hundredOperator(stack):
 	stack.append(100)
 
+#
+def piOperator(stack):
+	stack.append(math.pi)
+
+# 
+def eulerOperator(stack):
+	stack.append(math.e)
+
 
 # date/time oeprators, extensive like in EXP
 # timestamp (since epoch)
@@ -186,7 +194,7 @@ def dollarOperator(stack, z, mode):
 	elif mode == 2: # str
 		stack.append(list(z))
 	elif mode == 3: # list
-		result = []
+		"""result = []
 		for i in z:
 			if type(i) == int or type(i) == float:
 				result.append(str(utilities.formatNum(i)))
@@ -194,7 +202,8 @@ def dollarOperator(stack, z, mode):
 				result.append(z)
 			else:
 				dollarOperator(result, i, 3) # Push the result of recursively calling this on the sublist
-		stack.append(''.join(result))
+		stack.append(''.join(result))"""
+		stack.append(''.join(utilities.castToString(i) for i in z))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -397,7 +406,12 @@ def percentOperator(stack, x, y, mode):
 	elif mode == 4: # str, num
 		stack.append()
 	elif mode == 5: # str, str
-		stack.append()
+		s = x.split(y)
+		result = []
+		for i in s[:-1]:
+			result += [i, y]
+		result .append(s[-1])
+		stack.append(result)
 	elif mode == 6: # str, list
 		stack.append()
 	elif mode == 7: # list, num
@@ -409,6 +423,33 @@ def percentOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
+# &
+def ampersandOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(int(x) & int(y))
+	elif mode == 2: # num, str
+		stack.append()
+	elif mode == 3: # num, list
+		stack.append()
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append()
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		stack.append()
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		result = []
+		for i in x:
+			if i in y and i not in result:
+				result.append(i)
+		stack.append(result)
+	else:
+		dyadNotImplemented(mode, '')
+
 # *
 def asteriskOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
@@ -416,7 +457,18 @@ def asteriskOperator(stack, x, y, mode):
 	elif mode == 2: # num, str
 		stack.append()
 	elif mode == 3: # num, list
-		stack.append()
+		if x == 0:
+			stack.append([])
+			return
+		elif x < 0:
+			raise ValueError("can't do Cartesian power with negative exponent")
+
+		start = [[i] for i in y]
+		result = start
+		for i in range(int(x)-1):
+			result = [i+j for i in result for j in start]
+
+		stack.append(result)
 	elif mode == 4: # str, num
 		stack.append()
 	elif mode == 5: # str, str
@@ -608,6 +660,80 @@ def YOperator(stack, x, y, mode):
 		stack.append()
 	elif mode == 9: # list, list
 		stack.append()
+	else:
+		dyadNotImplemented(mode, '')
+
+# ^
+def caretOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(int(x) ^ int(y))
+	elif mode == 2: # num, str
+		stack.append()
+	elif mode == 3: # num, list
+		stack.append()
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append()
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		stack.append()
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		result = []
+
+		for i in x:
+			if i not in y and i not in result:
+				result.append(i)
+
+		for i in y:
+			if i not in x and i not in result:
+				result.append(i)
+
+		stack.append(result)
+	else:
+		dyadNotImplemented(mode, '')
+
+# |
+def pipeOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(int(x) | int(y))
+	elif mode == 2: # num, str
+		stack.append([y[:int(x)], y[int(x):]])
+	elif mode == 3: # num, list
+		stack.append([y[:int(x)], y[int(x):]])
+	elif mode == 4: # str, num
+		stack.append([x[:int(y)], x[int(y):]])
+	elif mode == 5: # str, str
+		stack.append()
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		stack.append([x[:int(y)], x[int(y):]])
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		result = []
+		for i in x+y:
+			if i not in result:
+				result.append(i)
+		stack.append(result)
+	else:
+		dyadNotImplemented(mode, '')
+
+# ∧
+def andOperator(stack, x, y, mode):
+	if mode > 0: # Same for any types...
+		stack.append(x and y)
+	else:
+		dyadNotImplemented(mode, '')
+
+# ∨
+def orOperator(stack, x, y, mode):
+	if mode > 0: # Same for any types...
+		stack.append(x or y)
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -811,11 +937,18 @@ ops = {
 	'⌉': Operator('⌉', 1, ceilOperator),
 	# Dyads
 	'%': Operator('%', 2, percentOperator),
+	'&': Operator('&', 2, ampersandOperator),
 	'*': Operator('*', 2, asteriskOperator),
 	'+': Operator('+', 2, plusOperator),
 	'/': Operator('/', 2, slashOperator),
+	'<': Operator('<', 2, lessThanOperator),
 	'=': Operator('=', 2, equalsOperator),
+	'>': Operator('>', 2, greaterThanOperator),
 	'Y': Operator('Y', 2, YOperator),
+	'^': Operator('^', 2, caretOperator),
+	'|': Operator('|', 2, pipeOperator),
+	'∧': Operator('∧', 2, andOperator),
+	'∨': Operator('∨', 2, orOperator),
 	'−': Operator('−', 2, minusOperator),
 	'×': Operator('×', 2, timesOperator),
 	'÷': Operator('÷', 2, divisionOperator),

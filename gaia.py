@@ -76,12 +76,15 @@ def decompose(line):
 			string = match.group(1)
 			terminator = match.group(2)
 			func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(string) ))
-			line = re.sub("^((\\[“”]|[^“])*)”", '', line)
-		elif re.match("^“[^”]*(”|$)", line):
+			line = re.sub("^((\\[“”]|[^“])*)([”‘’„‟])", '', line)
+		elif re.match("^“([^”‘’„‟]*)([”‘’„‟]|$)", line):
 			# Match a normal or unfinished string
 			#print("Normal/unfinished quote")
-			string = re.match("^“([^”]*)(”|$)", line).group(1)
+			match = re.match("^“([^”‘’„‟]*)([”‘’„‟]|$)", line)
+			string = match.group(1)
+			terminator = match.group(2)
 			strings = string.split('“')
+			
 			if len(strings) == 1:
 				func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) ))
 			else:
@@ -94,7 +97,7 @@ def decompose(line):
 			func.append(operators.Operator(match, 0, ( lambda x: lambda stack: stack.append(utilities.formatNum(x)) )(num) ))
 			line = re.sub("^-?(\d+(\.\d+)?|\.\d+)", '', line)
 			if re.match('^[₀₁₂₃₄₅₆₇₈₉]+', line):
-				# Subscript numbers after number literals form another number literal 
+				# Subscript numbers after number literals form another number literal
 				# (so you can write two literals with no separator)
 				num = re.match("^[₀₁₂₃₄₅₆₇₈₉]+", line).group(0)
 				func.append(operators.Operator(num, 0, ( lambda x: lambda stack: stack.append(utilities.formatNum(x)) )(parseSubscript(num)) ))
@@ -271,6 +274,5 @@ print("" if len(stack)==0 else utilities.outputFormat(stack[-1]))
 ### TESTING
 
 #print(stack)
-
 
 
