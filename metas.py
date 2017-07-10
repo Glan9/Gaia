@@ -17,6 +17,18 @@ import operators
 import utilities
 
 
+# ₛ
+def swappedArgs(stack, ops, mode = None, x = None, y = None):
+	if ops[0].arity == 0:
+		ops[0].execute(stack)
+	elif ops[0].arity == 1:
+		stack.append(x)
+		ops[0].execute(stack)
+	elif ops[0].arity == 2:
+		stack.append(y)
+		stack.append(x)
+		ops[0].execute(stack)
+
 # ?
 def conditional(stack, ops, mode = None, x = None, y = None):
 	if x:
@@ -305,6 +317,7 @@ Arity is either fixed (i.e. 1 for things like conditional), or -1 if the arity i
 """
 
 metas = {
+	'ₛ': ['ₛ', 1, -1, swappedArgs],
 	'?': ['?', 2, 1, conditional],
 	'¿': ['¿', 1, 1, ifTrue],
 	'¡': ['¡', 1, 1, ifFalse],

@@ -60,6 +60,24 @@ def determineMetaCallStyle(meta, arity, op1, op2 = None):
 	elif arity == 2:
 		return lambda stack, x, y, mode: meta(stack, ops, mode, x, y)
 
+"""
+parseString(string, terminator)
+
+"""
+def parseString(string, terminator):
+	if terminator == '‘':
+		# Base-250 number
+		digits = utilities.codepageEncode(string)
+		n = sum((250**i)*digits[~i] for i in range(len(digits)))
+		return n
+	elif terminator == '’':
+		# List of codepage indices
+		return list(utilities.codepageEncode(string))
+	else:
+		# Default to being a normal string
+		return string
+
+
 
 """
 Break a line (as a string) down into operators
@@ -83,7 +101,7 @@ def decompose(line):
 			match = re.match("^“([^”‘’„‟]*)([”‘’„‟]|$)", line)
 			string = match.group(1)
 			terminator = match.group(2)
-			strings = string.split('“')
+			strings = [parseString(s, terminator) for s in string.split('“')]
 			
 			if len(strings) == 1:
 				func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) ))
@@ -248,16 +266,27 @@ def runFunction(stack, func):
 
 code = ''
 
-if len(sys.argv) > 1:
-	source = open(sys.argv[1], 'r', encoding='utf-8')
+args = sys.argv[1:]
+flags = []
+
+if len(args) > 0:
+	if re.match('^-', args[0]):
+		# If the next arg starts with - it has flags
+		flags = list(args[0][1:])
+		args = args[1:]
+
+if len(args) > 0:
+	source = open(args[0], 'r', encoding='utf-8')
 	code = source.read()
 else:
-	sys.stderr.write("Error: No source file specified.\n")
+	raise Exception("No source file specified.\n")
 	exit(1)
 
 
-lines = code.split('\n')
+if 'e' in flags:
+	code = utilities.codepageDecode(code)
 
+lines = code.split('\n')
 
 
 for line in lines:

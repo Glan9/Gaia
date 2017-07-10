@@ -1,7 +1,8 @@
 import sys
 import re
+import array
 
-codepage = """₀₁₂₃₄₅₆₇₈₉ₓ₌ₔ   ⟨⟩⟪⟫⇑⇓⇐⇒↑↓←→⇈⇊⇇⇉ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\n""" # TODO: finish code page
+codepage = """₀₁₂₃₄₅₆₇₈₉ₓ₌ₛ   ⟨⟩⟪⟫⇑⇓⇐⇒↑↓←→⇈⇊⇇⇉ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\n«»…┅⌋⌉⊂⊃∧∨ΣΠø×÷−∈¤¶§√∆∇¿¡⁇⁈↻↺∞¦†‡“”‘’„‟""" # TODO: finish code page
 
 
 def flatten(l):
@@ -29,12 +30,12 @@ def getInput():
 	## TODO: Finish this function (add list parsing?)
 
 def codepageEncode(code):
-	result = ""
+	result = []
 	for c in code:
 		if codepage.find(c) != -1:
-			result += chr(codepage.index(c))
+			result.append(codepage.index(c))
 
-	return result
+	return array.array('B', result).tostring()
 
 def codepageDecode(code):
 	result = ""

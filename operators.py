@@ -359,7 +359,9 @@ def highEllipsisOperator(stack, z, mode):
 # Σ
 def sigmaOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append()
+		temp = []
+		dollarOperator(temp, z, 1)
+		stack.append(sum(temp[0]))
 	elif mode == 2: # str
 		stack.append()
 	elif mode == 3: # list
@@ -933,6 +935,7 @@ ops = {
 	'_': Operator('_', 1, underscoreOperator),
 	'…': Operator('…', 1, lowEllipsisOperator),
 	'┅': Operator('┅', 1, highEllipsisOperator),
+	'Σ': Operator('Σ', 1, sigmaOperator),
 	'⌋': Operator('⌋', 1, floorOperator),
 	'⌉': Operator('⌉', 1, ceilOperator),
 	# Dyads
