@@ -61,21 +61,36 @@ def determineMetaCallStyle(meta, arity, op1, op2 = None):
 		return lambda stack, x, y, mode: meta(stack, ops, mode, x, y)
 
 """
-parseString(string, terminator)
+parseStrings(string, terminator)
 
+string:     The part of the text between the initial opening quote and the ending quote, including additional opening quotes
+terminator: The ending quote
 """
-def parseString(string, terminator):
+def parseStrings(string, terminator):
+	strings = string.split('“')
 	if terminator == '‘':
 		# Base-250 number
-		digits = utilities.codepageEncode(string)
-		n = sum((250**i)*digits[~i] for i in range(len(digits)))
-		return n
+		for i in range(len(strings)):
+			digits = utilities.codepageEncode(string)
+			strings[i] = sum((250**i)*digits[~i] for i in range(len(digits)))
+		if len(strings) == 1:
+			return operators.Operator('“'+string+'‘', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
+		else:
+			return operators.Operator('“'+string+'‘', 0, ( lambda x: lambda stack: stack.append(x) )(strings) )
 	elif terminator == '’':
 		# List of codepage indices
-		return list(utilities.codepageEncode(string))
+		strings = [list(utilities.codepageEncode(string)) for string in strings]
+
+		if len(strings) == 1:
+			return operators.Operator('“'+string+'’', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
+		else:
+			return operators.Operator('“'+string+'’', 0, ( lambda x: lambda stack: stack.append(x) )(strings) )
 	else:
 		# Default to being a normal string
-		return string
+		if len(strings) == 1:
+			return operators.Operator('“'+string+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
+		else:
+			return operators.Operator('“'+string+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings) )
 
 
 
@@ -101,13 +116,13 @@ def decompose(line):
 			match = re.match("^“([^”‘’„‟]*)([”‘’„‟]|$)", line)
 			string = match.group(1)
 			terminator = match.group(2)
-			strings = [parseString(s, terminator) for s in string.split('“')]
+			func.append(parseStrings(string, terminator))
 			
-			if len(strings) == 1:
-				func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) ))
-			else:
-				func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(strings) ))
-			line = re.sub("^“([^”]*)(”|$)", '', line)
+			#if len(strings) == 1:
+			#	func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) ))
+			#else:
+			#	func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(strings) ))
+			line = re.sub("^“([^”‘’„‟]*)([”‘’„‟]|$)", '', line)
 		elif re.match("^-?(\d+(\.\d+)?|\.\d+)", line):
 			# Match a number literal
 			match = re.match("^-?(\d+(\.\d+)?|\.\d+)", line).group(0)
@@ -209,6 +224,13 @@ def decompose(line):
 			# Match the opening of an array
 			func.append(operators.Operator(']', 0, closeArray))
 			line = line[1:]
+		elif line[0] in '∂€₵':
+			# Match the potential start of a 2-byte operator/constant
+			if line[:2] in operators.ops:
+				func.append(operators.ops[line[:2]])
+				line = line[2:]
+			else:
+				line = line[1:]
 		elif line[0] in operators.ops:
 			# Match an operator
 			#print("Operator")
@@ -232,11 +254,13 @@ def decompose(line):
 					arity = func[i-1].arity if func[i][2] == -1 else func[i][2]
 
 					func = func[:i-1]+[ operators.Operator(func[i-1].name+func[i][0], arity, determineMetaCallStyle(func[i][3], arity, func[i-1]) ) ]+func[i+1:]
+					i -= 1
 			else:
 				# If it acts on 2 operators
 				if (i >= 2) and (type(func[i-1]) == operators.Operator) and (type(func[i-2]) == operators.Operator):
 					arity = func[i][2]
 					func = func[:i-2]+[ operators.Operator(func[i-2].name+func[i-1].name+func[i][0], arity, determineMetaCallStyle(func[i][3], arity, func[i-2], func[i-1]) ) ]+func[i+1:]
+					i -= 2
 		i += 1
 
 	return func

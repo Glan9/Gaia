@@ -2,7 +2,7 @@ import sys
 import re
 import array
 
-codepage = """₀₁₂₃₄₅₆₇₈₉ₓ₌ₛ   ⟨⟩⟪⟫⇑⇓⇐⇒↑↓←→⇈⇊⇇⇉ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\n«»…┅⌋⌉⊂⊃∧∨ΣΠø×÷−∈¤¶§√∆∇¿¡⁇⁈↻↺∞¦†‡“”‘’„‟""" # TODO: finish code page
+codepage = """₀₁₂₃₄₅₆₇₈₉ₓ₌ₔ∂€₵⟨⟩⟪⟫⇑⇓⇐⇒↑↓←→⇈⇊⇇⇉ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\n«»…┅⌋⌉⊂⊃∧∨ΣΠø×÷−∈¤¶§√∆∇¿¡⁇⁈↻↺∞¦†‡“”‘’„‟""" # TODO: finish code page
 
 
 def flatten(l):

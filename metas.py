@@ -17,7 +17,7 @@ import operators
 import utilities
 
 
-# ₛ
+# ₔ
 def swappedArgs(stack, ops, mode = None, x = None, y = None):
 	if ops[0].arity == 0:
 		ops[0].execute(stack)
@@ -317,7 +317,7 @@ Arity is either fixed (i.e. 1 for things like conditional), or -1 if the arity i
 """
 
 metas = {
-	'ₛ': ['ₛ', 1, -1, swappedArgs],
+	'ₔ': ['ₔ', 1, -1, swappedArgs],
 	'?': ['?', 2, 1, conditional],
 	'¿': ['¿', 1, 1, ifTrue],
 	'¡': ['¡', 1, 1, ifFalse],

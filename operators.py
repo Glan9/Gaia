@@ -168,6 +168,10 @@ def piOperator(stack):
 def eulerOperator(stack):
 	stack.append(math.e)
 
+# ;
+def semicolonOperator(stack):
+	stack.append(stack[-2])
+
 
 # date/time oeprators, extensive like in EXP
 # timestamp (since epoch)
@@ -239,13 +243,6 @@ def colonOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
-# ;
-def semicolonOperator(stack, z, mode):
-	if mode > 0:   # same for all types...
-		stack.append(stack[-2])
-	else:
-		monadNotImplemented(mode, '')
-
 # b
 def bOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -288,7 +285,7 @@ def nOperator(stack, z, mode):
 	elif mode == 2: # str
 		stack.append(z.split('\n'))
 	elif mode == 3: # list
-		stack.append('\n'.join(map(str, z)))
+		stack.append('\n'.join(map(utilities.castToString, z)))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -319,7 +316,13 @@ def underscoreOperator(stack, z, mode):
 # …
 def lowEllipsisOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append(list(range(int(z))))
+		z = int(z)
+		if z == 0:
+			stack.append([])
+		elif z > 0:
+			stack.append(list(range(z)))
+		elif z < 0:
+			stack.append(list(range(0, z, -1)))
 	elif mode == 2: # str
 		# First check to make sure its alphabetic
 		for c in z:
@@ -343,7 +346,13 @@ def lowEllipsisOperator(stack, z, mode):
 # ┅
 def highEllipsisOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append(list(range(int(z)+1))[1:])
+		z = int(z)
+		if z == 0:
+			stack.append([0])
+		elif z > 0:
+			stack.append(list(range(1, z+1)))
+		elif z < 0:
+			stack.append(list(range(-1, z-1, -1)))
 	elif mode == 2: # str
 		if len(z)==0:
 			raise ValueError("argument must be at least 1 character long")
@@ -394,6 +403,50 @@ def ceilOperator(stack, z, mode):
 			stack.append(z[-1])
 	else:
 		monadNotImplemented(mode, '')
+
+# ±
+def plusMinusOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(-1 if z < 0 else (1 if z > 0 else 0))
+	elif mode == 2: # str
+		stack.append(z.strip())
+	elif mode == 3: # list
+		if len(z) <= 1:
+			stack.append(z)
+		else:
+			stack.append([z[i+1]-z[i] for i in range(len(z)-1)])
+	else:
+		monadNotImplemented(mode, '')
+
+
+#-- Extended Monads -- #
+
+# €[
+def extLeftBracketOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append()
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		stack.append([re.sub("^\s*([\s\S]*?)\s*$", "\g<1>", utilities.castToString(i)) for i in z])
+	else:
+		monadNotImplemented(mode, '')
+
+# €|
+def extPipeOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append()
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		z = [re.sub("^\s*([\s\S]*?)\s*$", "\g<1>", utilities.castToString(i)) for i in z]
+		maxLength = max(len(i) for i in z)
+
+		result = [(math.ceil((maxLength-len(i))/2)*' ')+i+(math.floor((maxLength-len(i))/2)*' ') for i in z]
+		stack.append(result)
+	else:
+		monadNotImplemented(mode, '')
+
 
 ''' DYADS '''
 
@@ -866,6 +919,13 @@ def currencyOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
+
+#-- Extended Dyads -- #
+
+
+
+
+
 """
 Blank operator function, just easy to copy-paste
 
@@ -917,6 +977,7 @@ Each value should be an Operator object
 
 ops = {
 	# Nilads
+	';': Operator(';', 0, semicolonOperator),
 	'ø': Operator('ø', 0, emptySetOperator),
 	'¶': Operator('¶', 0, pilcrowOperator),
 	'§': Operator('§', 0, sectionOperator),
@@ -926,7 +987,6 @@ ops = {
 	'(': Operator('(', 1, leftParenthesisOperator),
 	')': Operator(')', 1, rightParenthesisOperator),
 	':': Operator(':', 1, colonOperator),
-	';': Operator(';', 1, semicolonOperator),
 	'b': Operator('b', 1, bOperator),
 	'i': Operator('i', 1, iOperator),
 	'l': Operator('l', 1, lOperator),
@@ -938,6 +998,9 @@ ops = {
 	'Σ': Operator('Σ', 1, sigmaOperator),
 	'⌋': Operator('⌋', 1, floorOperator),
 	'⌉': Operator('⌉', 1, ceilOperator),
+	'±': Operator('±', 1, plusMinusOperator),
+	'€|': Operator('€|', 1, extPipeOperator),
+	'€[': Operator('€[', 1, extLeftBracketOperator),
 	# Dyads
 	'%': Operator('%', 2, percentOperator),
 	'&': Operator('&', 2, ampersandOperator),
@@ -957,5 +1020,6 @@ ops = {
 	'÷': Operator('÷', 2, divisionOperator),
 	'∈': Operator('∈', 2, elementOfOperator),
 	'¤': Operator('¤', 2, currencyOperator)
+
 
 }
