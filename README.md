@@ -2,9 +2,9 @@
 
 A work-in-progress golfing language inspired by [CJam](https://sourceforge.net/projects/cjam/), [Jelly](https://github.com/DennisMitchell/jelly), [Ohm](https://github.com/nickbclifford/Ohm), and [SOGL](https://github.com/dzaima/SOGL).
 
-Gaia is still very much incomplete. Currently it's more or less usable but still has a very limited set of operators and built-in functions.
+Gaia is still very much incomplete. Currently it's more or less usable but still has a limited set of operators and built-in functions.
 
-Documentation is currently unavailable, because I haven't even designed the entire spec yet.
+Documentation is currently unavailable and features are subject to change without warning (as it's still in development).
 
 ## Basic Syntax
 
