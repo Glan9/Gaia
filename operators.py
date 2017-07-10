@@ -120,36 +120,36 @@ def pilcrowOperator(stack):
 def sectionOperator(stack):
 	stack.append(' ')
 
-# 
-def lowerlettersOperator(stack):
+# ₵L
+def constLOperator(stack):
 	stack.append('abcdefghijklmnopqrstuvwxyz')
 
-# 
-def upperlettersOperator(stack):
+# ₵U
+def constUOperator(stack):
 	stack.append('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
-# 
-def vowelsOperator(stack):
+# ₵V
+def constVOperator(stack):
 	stack.append('aeiou')
 
-# 
-def vowelsAltOperator(stack):
+# ₵X
+def constXOperator(stack):
 	stack.append('aeiouy')
 
-# 
-def consonantsOperator(stack):
+# ₵C
+def constCOperator(stack):
 	stack.append('bcdfghjklmnpqrstvwxyz')
 
-# 
-def consonantsAltOperator(stack):
+# ₵Y
+def constYOperator(stack):
 	stack.append('bcdfghjklmnpqrstvwxz')
 
-# 
-def digitsOperator(stack):
+# ₵D
+def constDOperator(stack):
 	stack.append('0123456789')
 
-# 
-def qwertyOperator(stack):
+# ₵Q
+def constQOperator(stack):
 	stack.append(['qwertyuiop', 'asdfghjkl', 'zxcvbnm'])
 
 # 
@@ -160,12 +160,12 @@ def tenOperator(stack):
 def hundredOperator(stack):
 	stack.append(100)
 
-#
-def piOperator(stack):
+# ₵P
+def constPOperator(stack):
 	stack.append(math.pi)
 
-# 
-def eulerOperator(stack):
+# ₵E
+def constEOperator(stack):
 	stack.append(math.e)
 
 # ;
@@ -978,6 +978,16 @@ Each value should be an Operator object
 ops = {
 	# Nilads
 	';': Operator(';', 0, semicolonOperator),
+	'₵C': Operator('₵C', 0, constCOperator),
+	'₵D': Operator('₵D', 0, constDOperator),
+	'₵E': Operator('₵E', 0, constEOperator),
+	'₵L': Operator('₵L', 0, constLOperator),
+	'₵P': Operator('₵P', 0, constPOperator),
+	'₵Q': Operator('₵Q', 0, constQOperator),
+	'₵U': Operator('₵U', 0, constUOperator),
+	'₵V': Operator('₵V', 0, constVOperator),
+	'₵X': Operator('₵X', 0, constXOperator),
+	'₵Y': Operator('₵Y', 0, constYOperator),
 	'ø': Operator('ø', 0, emptySetOperator),
 	'¶': Operator('¶', 0, pilcrowOperator),
 	'§': Operator('§', 0, sectionOperator),

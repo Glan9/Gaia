@@ -299,6 +299,35 @@ def untilLoop(stack, ops, mode = None, x = None, y = None):
 		else:
 			break
 
+# TODO
+def untilDoneLoop(stack, ops, mode = None, x = None, y = None):
+	lastValue = None
+
+	while True:
+		ops[0].execute(stack)
+		if not (lastValue == None or len(stack) == 0 or stack[-1] != lastValue):
+			break
+		lastValue = stack[-1]
+
+# TODO
+def untilDifferentLoop(stack, ops, mode = None, x = None, y = None):
+	lastValue = None
+
+	while True:
+		ops[0].execute(stack)
+		if not (lastValue == None or len(stack) == 0 or stack[-1] == lastValue):
+			break
+		lastValue = stack[-1]
+
+# TODO
+def untilUniqueLoop(stack, ops, mode = None, x = None, y = None):
+	values = []
+
+	while True:
+		ops[0].execute(stack)
+		if not (len(values) == 0 or len(stack) == 0 or stack[-1] not in values):
+			break
+		values.append(stack[-1])
 
 # ∞
 def infiniteLoop(stack, ops, mode = None, x = None, y = None):

@@ -95,7 +95,7 @@ def castToList(v):
 		sign = -1 if v < 0 else 1
 		v = abs(int(v))
 
-		return list(map(lambda x:x*sign, list(range(1, v+1) if v>0 else [])))
+		return list(map(lambda x:x*sign, list(range(1, v+1) if v>0 else [0])))
 
 	elif type(v) == str:
 		return list(v)

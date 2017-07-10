@@ -85,6 +85,7 @@ def parseStrings(string, terminator):
 			return operators.Operator('“'+string+'’', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
 		else:
 			return operators.Operator('“'+string+'’', 0, ( lambda x: lambda stack: stack.append(x) )(strings) )
+	# TODO elif tarminator == '„':
 	else:
 		# Default to being a normal string
 		if len(strings) == 1:
@@ -311,7 +312,6 @@ if len(args) > 0:
 else:
 	raise Exception("No source file specified.\n")
 	exit(1)
-
 
 lines = code.split('\n')
 
