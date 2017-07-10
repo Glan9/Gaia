@@ -2,7 +2,8 @@ import sys
 import re
 import array
 
-codepage = """₀₁₂₃₄₅₆₇₈₉ₓ₌ₔ∂€₵⟨⟩⟪⟫⇑⇓⇐⇒↑↓←→⇈⇊⇇⇉ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\n«»…┅⌋⌉⊂⊃∧∨ΣΠø×÷−∈¤¶§√∆∇¿¡⁇⁈↻↺∞¦†‡“”‘’„‟""" # TODO: finish code page
+codepage = """₀₁₂₃₄₅₆₇₈₉ₓ₌ₔ∂€₵⟨⟩⟪⟫⇑⇓⇐⇒↑↓←→⇈⇊⇇⇉ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+«»…┅⌋⌉⊂⊃∧∨ΣΠø×÷−∈        ±¤¶§√∆∇                                                                ¿¡⁇⁈↻↺∞¦†‡                “”‘’„‟""" # TODO: finish code page
 
 
 def flatten(l):
@@ -39,8 +40,8 @@ def codepageEncode(code):
 
 def codepageDecode(code):
 	result = ""
-	for c in code.encode('utf-8'):
-		result += codepage[c]
+	for byte in code:
+		result += codepage[byte]
 
 	return result
 

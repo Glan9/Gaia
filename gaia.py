@@ -300,15 +300,18 @@ if len(args) > 0:
 		args = args[1:]
 
 if len(args) > 0:
-	source = open(args[0], 'r', encoding='utf-8')
+	source = open(args[0], 'rb')
 	code = source.read()
+
+	if 'e' in flags:
+		code = utilities.codepageDecode(code)
+	else:
+		code = code.decode('utf-8')
+
 else:
 	raise Exception("No source file specified.\n")
 	exit(1)
 
-
-if 'e' in flags:
-	code = utilities.codepageDecode(code)
 
 lines = code.split('\n')
 
