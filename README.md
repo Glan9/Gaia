@@ -4,7 +4,7 @@ A work-in-progress golfing language inspired by [CJam](https://sourceforge.net/p
 
 Gaia is still incomplete. Currently the parser is mostly complete, so it's usable but still has a limited set of operators and built-in functions.
 
-Documentation is currently unavailable. I will being to write up proper docs when the language is more compelte.
+Documentation is currently unavailable. I will begin to write up proper docs when the language is more complete.
 
 ## Basic Syntax
 
