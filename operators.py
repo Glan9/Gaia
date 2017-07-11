@@ -216,7 +216,8 @@ def leftParenthesisOperator(stack, z, mode):
 	if mode == 1:   # num
 		stack.append(z-1)
 	elif mode == 2: # str
-		stack.append()
+		if len(z) > 0:
+			stack.append(z[-1])
 	elif mode == 3: # list
 		if len(z) > 0:
 			stack.append(z[0])
@@ -228,7 +229,8 @@ def rightParenthesisOperator(stack, z, mode):
 	if mode == 1:   # num
 		stack.append(z+1)
 	elif mode == 2: # str
-		stack.append()
+		if len(z) > 0:
+			stack.append(z[-1])
 	elif mode == 3: # list
 		if len(z) > 0:
 			stack.append(z[-1])
@@ -300,6 +302,11 @@ def vOperator(stack, z, mode):
 	elif mode == 3: # list
 		stack.append(z[::-1])
 	else:
+		monadNotImplemented(mode, '')
+
+# x  TODO this may not be x necessarily
+def xOperator(stack, z , mode):
+	if mode == 0:
 		monadNotImplemented(mode, '')
 
 # _
@@ -1002,6 +1009,7 @@ ops = {
 	'l': Operator('l', 1, lOperator),
 	'n': Operator('n', 1, nOperator),
 	'v': Operator('v', 1, vOperator),
+	'x': Operator('x', 1, xOperator),
 	'_': Operator('_', 1, underscoreOperator),
 	'…': Operator('…', 1, lowEllipsisOperator),
 	'┅': Operator('┅', 1, highEllipsisOperator),
@@ -1025,7 +1033,7 @@ ops = {
 	'|': Operator('|', 2, pipeOperator),
 	'∧': Operator('∧', 2, andOperator),
 	'∨': Operator('∨', 2, orOperator),
-	'−': Operator('−', 2, minusOperator),
+	'⁻': Operator('⁻', 2, minusOperator),
 	'×': Operator('×', 2, timesOperator),
 	'÷': Operator('÷', 2, divisionOperator),
 	'∈': Operator('∈', 2, elementOfOperator),
