@@ -201,6 +201,23 @@ def mapList(stack, ops, mode = None, x = None, y = None):
 				result += tempStack
 			stack.append(result)
 
+# ⊢
+def reduceList(stack, ops, mode = None, x = None, y = None):
+	if ops[0].arity != 2:
+		raise SyntaxError("⊢ must be combined with a dyad")
+
+	x = utilities.castToList(x)
+
+	if len(x) == 0:
+		stack.append(0)
+	else:
+		stack.append(x[0])
+		x = x[1:]
+		for i in x:
+			stack.append(i)
+			ops[0].execute(stack)
+
+
 # #
 def search(stack, ops, mode = None, x = None, y = None):
 	result = []
@@ -370,6 +387,7 @@ metas = {
 	'⁇': ['⁇', 1, -1, select],
 	'⁈': ['⁈', 1, -1, reject],
 	'¦': ['¦', 1, -1, mapList],
+	'⊢': ['⊢', 1, 1, reduceList],
 	'#': ['#', 1, -1, search],
 	'†': ['†', 1, 2, vectorize],
 	'↺': ['↺', 2, 0, whileLoop],

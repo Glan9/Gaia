@@ -262,6 +262,17 @@ def bOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# e
+def eOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(10**z)
+	#elif mode == 2: # str
+		# Not sure how eval will work yet
+	elif mode == 3: # list
+		[stack.append(i) for i in z]
+	else:
+		monadNotImplemented(mode, 'e')
+
 # i
 def iOperator(stack, z, mode):
 	if mode > 0:
@@ -288,6 +299,17 @@ def nOperator(stack, z, mode):
 		stack.append(z.split('\n'))
 	elif mode == 3: # list
 		stack.append('\n'.join(map(utilities.castToString, z)))
+	else:
+		monadNotImplemented(mode, '')
+
+# s
+def sOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append()
+	elif mode == 2: # str
+		stack.append(z.split(' '))
+	elif mode == 3: # list
+		stack.append(' '.join(map(utilities.castToString, z)))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1005,9 +1027,11 @@ ops = {
 	')': Operator(')', 1, rightParenthesisOperator),
 	':': Operator(':', 1, colonOperator),
 	'b': Operator('b', 1, bOperator),
+	'e': Operator('e', 1, eOperator),
 	'i': Operator('i', 1, iOperator),
 	'l': Operator('l', 1, lOperator),
 	'n': Operator('n', 1, nOperator),
+	's': Operator('s', 1, sOperator),
 	'v': Operator('v', 1, vOperator),
 	'x': Operator('x', 1, xOperator),
 	'_': Operator('_', 1, underscoreOperator),
