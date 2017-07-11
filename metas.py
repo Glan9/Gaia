@@ -29,6 +29,18 @@ def swappedArgs(stack, ops, mode = None, x = None, y = None):
 		stack.append(x)
 		ops[0].execute(stack)
 
+# ₌
+def peek(stack, ops, mode = None, x = None, y = None):
+	if ops[0].arity == 0:
+		ops[0].execute(stack)
+	elif ops[0].arity == 1:
+		stack.append(x)
+		ops[0].execute(stack)
+	elif ops[0].arity == 2:
+		stack.append(y)
+		stack.append(x)
+		ops[0].execute(stack)
+
 # ?
 def conditional(stack, ops, mode = None, x = None, y = None):
 	if x:
@@ -252,11 +264,15 @@ def vectorize(stack, ops, mode = None, x = None, y = None):
 	if ops[0].arity == 1:
 		tempStack = [x]
 		ops[0].execute(tempStack)
-		stack += tempStack
+		tempStack = tempStack[::-1]
+		while tempStack:
+			stack.append(tempStack.pop())
 
 		tempStack = [y]
 		ops[0].execute(tempStack)
-		stack += tempStack
+		tempStack = tempStack[::-1]
+		while tempStack:
+			stack.append(tempStack.pop())
 
 	if ops[0].arity == 2:
 		result = []
@@ -347,6 +363,7 @@ Arity is either fixed (i.e. 1 for things like conditional), or -1 if the arity i
 
 metas = {
 	'ₔ': ['ₔ', 1, -1, swappedArgs],
+	'₌': ['₌', 1, -1, peek],
 	'?': ['?', 2, 1, conditional],
 	'¿': ['¿', 1, 1, ifTrue],
 	'¡': ['¡', 1, 1, ifFalse],
