@@ -5,6 +5,7 @@ import array
 codepage = """₀₁₂₃₄₅₆₇₈₉ₓ₌ₔ∂€₵⟨⟩⟪⟫⇑⇓⇐⇒↑↓←→⇈⇊⇇⇉ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
 «»…┅⌋⌉⊂⊃∧∨ΣΠø×÷⁻∈±¤¶§√∆∇ȦĊḊĖḞĠḢṀṄȮṖṘṠṪẆẊẎŻȧċḋėḟġḣṁṅȯṗṙṡṫẇẋẏżẠḄḌẸḤḲḶṂṆỌṚṢṬỤṾẈỴẒạḅḍẹḥḳḷṃṇọṛṣṭụṿẉỵẓ¿¡⁇⁈↻↺∞¦†‡♀♂⊢⊣            “”‘’„‟""" # TODO: finish code page
 
+manualOutput = False
 
 def flatten(l):
 	result = []

@@ -216,7 +216,7 @@ def dollarOperator(stack, z, mode):
 # (
 def leftParenthesisOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append(z-1)
+		stack.append(utitlities.formatNum(z-1))
 	elif mode == 2: # str
 		if len(z) > 0:
 			stack.append(z[-1])
@@ -229,7 +229,7 @@ def leftParenthesisOperator(stack, z, mode):
 # )
 def rightParenthesisOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append(z+1)
+		stack.append(utitlities.formatNum(z+1))
 	elif mode == 2: # str
 		if len(z) > 0:
 			stack.append(z[-1])
@@ -244,23 +244,6 @@ def colonOperator(stack, z, mode):
 	if mode > 0:   # same for all types...
 		stack.append(z)
 		stack.append(z)
-	else:
-		monadNotImplemented(mode, '')
-
-# b
-def bOperator(stack, z, mode):
-	if mode == 1:   # num
-		stack.append()
-	elif mode == 2: # str
-		if z == "":
-			stack.append("")
-		else:
-			stack.append(z + z[-2::-1])
-	elif mode == 3: # list
-		if z == []:
-			stack.append([])
-		else:
-			stack.append(z + z[-2::-1])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -290,6 +273,22 @@ def lOperator(stack, z, mode):
 		stack.append(len(z))
 	elif mode == 3: # list
 		stack.append(len(z))
+	else:
+		monadNotImplemented(mode, '')
+
+# p
+def pOperator(stack, z, mode):
+	if mode > 0:   # any types
+		sys.stdout.write(utilities.outputFormat(z))
+		utilities.manualOutput = True
+	else:
+		monadNotImplemented(mode, '')
+
+# q
+def qOperator(stack, z, mode):
+	if mode > 0:   # any types
+		print(utilities.outputFormat(z))
+		utilities.manualOutput = True
 	else:
 		monadNotImplemented(mode, '')
 
@@ -497,6 +496,23 @@ def sLowDotOperator(stack, z, mode):
 		stack.append(z.split('\n'))
 	elif mode == 3: # list
 		stack.append('\n'.join(map(utilities.castToString, z)))
+	else:
+		monadNotImplemented(mode, '')
+
+# ṫ
+def tHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.formatNum(math.tan(z)))
+	elif mode == 2: # str
+		if z == "":
+			stack.append("")
+		else:
+			stack.append(z + z[-2::-1])
+	elif mode == 3: # list
+		if z == []:
+			stack.append([])
+		else:
+			stack.append(z + z[-2::-1])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1127,10 +1143,11 @@ ops = {
 	'(': Operator('(', 1, leftParenthesisOperator),
 	')': Operator(')', 1, rightParenthesisOperator),
 	':': Operator(':', 1, colonOperator),
-	'b': Operator('b', 1, bOperator),
 	'e': Operator('e', 1, eOperator),
 	'i': Operator('i', 1, iOperator),
 	'l': Operator('l', 1, lOperator),
+	'p': Operator('p', 1, pOperator),
+	'q': Operator('q', 1, qOperator),
 	't': Operator('t', 1, tOperator),
 	'v': Operator('v', 1, vOperator),
 	'w': Operator('w', 1, wOperator),
@@ -1146,6 +1163,7 @@ ops = {
 	'ọ': Operator('ọ', 1, oLowDotOperator),
 	'ṡ': Operator('ṡ', 1, sHighDotOperator),
 	'ṣ': Operator('ṣ', 1, sLowDotOperator),
+	'ṫ': Operator('ṫ', 1, tHighDotOperator),
 	'ż': Operator('ż', 1, zHighDotOperator),
 	'€|': Operator('€|', 1, extPipeOperator),
 	'€[': Operator('€[', 1, extLeftBracketOperator),

@@ -112,26 +112,20 @@ def decompose(line):
 
 		if re.match("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", line):
 			# Match an unopened quote
-			#print("Unstarted quote")
 			match = re.match("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", line)
 			string = match.group(1)
 			terminator = match.group(3)
 
 			func.append(parseString(string, terminator))
-			#func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(string) ))
+			
 			line = re.sub("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", '', line)
 		elif re.match("^“((\\\\[“”‘’„‟]|[^”‘’„‟])*)([”‘’„‟]|$)", line):
 			# Match a normal or unfinished string
-			#print("Normal/unfinished quote")
 			match = re.match("^“((\\\\[“”‘’„‟]|[^”‘’„‟])*)([”‘’„‟]|$)", line)
 			string = match.group(1)
 			terminator = match.group(3)
 			func.append(parseString(string, terminator))
 			
-			#if len(strings) == 1:
-			#	func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) ))
-			#else:
-			#	func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(strings) ))
 			line = re.sub("^“((\\\\[“”‘’„‟]|[^”‘’„‟])*)([”‘’„‟]|$)", '', line)
 		elif re.match("^-?(\d+(\.\d+)?|\.\d+)", line):
 			# Match a number literal
@@ -244,16 +238,13 @@ def decompose(line):
 				line = line[1:]
 		elif line[0] in operators.ops:
 			# Match an operator
-			#print("Operator")
 			func.append(operators.ops[line[0]])
 			line = line[1:]
 		elif line[0] in metas.metas:
 			# Match a meta
-			#print("Meta")
 			func.append(metas.metas[line[0]])
 			line = line[1:]
 		else:
-			#print("Other")
 			line = line[1:]
 
 	i = 0
@@ -333,9 +324,7 @@ for line in lines:
 callStack.append(len(functions)-1)
 runFunction(stack, functions[callStack[-1]])
 
-print("" if len(stack)==0 else utilities.outputFormat(stack[-1]))
+if len(stack) > 0 and utilities.manualOutput == False:
+	print(utilities.outputFormat(stack[-1]))
 
-### TESTING
-
-#print(stack)
 
