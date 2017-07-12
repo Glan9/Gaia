@@ -322,12 +322,11 @@ for line in lines:
 # Running
 
 callStack.append(len(functions)-1)
-runFunction(stack, functions[callStack[-1]])
+#runFunction(stack, functions[callStack[-1]])
 
 print("" if len(stack)==0 else utilities.outputFormat(stack[-1]))
 
 ### TESTING
 
 #print(stack)
-
 

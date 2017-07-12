@@ -120,6 +120,10 @@ def pilcrowOperator(stack):
 def sectionOperator(stack):
 	stack.append(' ')
 
+# ∇
+def nablaOperator(stack):
+	stack.append(utilities.getInput())
+
 # ₵L
 def constLOperator(stack):
 	stack.append('abcdefghijklmnopqrstuvwxyz')
@@ -148,6 +152,10 @@ def constYOperator(stack):
 def constDOperator(stack):
 	stack.append('0123456789')
 
+# ₵P
+def constPOperator(stack):
+	stack.append("""'":;/.,()&!?""")
+
 # ₵Q
 def constQOperator(stack):
 	stack.append(['qwertyuiop', 'asdfghjkl', 'zxcvbnm'])
@@ -167,10 +175,6 @@ def constPOperator(stack):
 # ₵E
 def constEOperator(stack):
 	stack.append(math.e)
-
-# ;
-def semicolonOperator(stack):
-	stack.append(stack[-2])
 
 
 # date/time oeprators, extensive like in EXP
@@ -265,7 +269,7 @@ def bOperator(stack, z, mode):
 # e
 def eOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append(10**z)
+		stack.append(utilities.formatNum(10**z))
 	#elif mode == 2: # str
 		# Not sure how eval will work yet
 	elif mode == 3: # list
@@ -313,6 +317,28 @@ def sOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# t
+def tOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append()
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		z = [i if type(i)==list else [i] for i in z]
+
+		maxrow = max(map(len, z))
+		newmatrix = []
+
+		for c in range(maxrow):
+			newrow = []
+			for r in z:
+				if len(r) > c:
+					newrow.append(r[c])
+			newmatrix.append(newrow)
+		stack.append(newmatrix)
+	else:
+		monadNotImplemented(mode, 't')
+
 # v
 def vOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -326,8 +352,15 @@ def vOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
-# x  TODO this may not be x necessarily
-def xOperator(stack, z , mode):
+# w
+def wOperator(stack, z, mode):
+	if mode > 0: # any types
+		stack.append([z])
+	else:
+		monadNotImplemented(mode, '')
+
+# \
+def backslashOperator(stack, z , mode):
 	if mode == 0:
 		monadNotImplemented(mode, '')
 
@@ -447,6 +480,16 @@ def plusMinusOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# ż
+def zUpDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.formatNum(z**2))
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		stack.append()
+	else:
+		monadNotImplemented(mode, '')
 
 #-- Extended Monads -- #
 
@@ -484,11 +527,11 @@ def percentOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(utilities.formatNum(x % y))
 	elif mode == 2: # num, str
-		stack.append()
+		stack.append(y[::int(x)])
 	elif mode == 3: # num, list
 		stack.append(y[::int(x)])
 	elif mode == 4: # str, num
-		stack.append()
+		stack.append(x[::int(y)])
 	elif mode == 5: # str, str
 		s = x.split(y)
 		result = []
@@ -598,6 +641,13 @@ def plusOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '+')
 
+# ,
+def commaOperator(stack, x, y, mode):
+	if mode > 0: # any types
+		stack.append([x, y])
+	else:
+		dyadNotImplemented(mode, '')
+
 # /
 def slashOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
@@ -629,6 +679,15 @@ def slashOperator(stack, x, y, mode):
 		stack.append()
 	elif mode == 9: # list, list
 		stack.append()
+	else:
+		dyadNotImplemented(mode, '')
+
+# ;
+def semicolonOperator(stack, x, y, mode):
+	if mode > 0: # any types
+		stack.append(x)
+		stack.append(y)
+		stack.append(x)
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -707,7 +766,18 @@ def YOperator(stack, x, y, mode):
 		stack.append(utilities.formatNum(x // y))
 		stack.append(utilities.formatNum(x % y))
 	elif mode == 2: # num, str
-		stack.append()
+		result = []
+		x = int(x)
+		if x < 1 or x > len(y):
+			raise ValueError("invalid size for unzipping: "+str(x))
+		for i in range(x):
+			index = i
+			step = []
+			while index < len(y):
+				step.append(y[index])
+				index += x
+			result.append(''.join(step))
+		stack.append(result)
 	elif mode == 3: # num, list
 		result = []
 		x = int(x)
@@ -722,7 +792,18 @@ def YOperator(stack, x, y, mode):
 			result.append(step)
 		stack.append(result)
 	elif mode == 4: # str, num
-		stack.append()
+		result = []
+		y = int(y)
+		if y < 1 or y > len(x):
+			raise ValueError("invalid size for unzipping "+str(y))
+		for i in range(y):
+			index = i
+			step = []
+			while index < len(x):
+				step.append(x[index])
+				index += y
+			result.append(''.join(step))
+		stack.append(result)
 	elif mode == 5: # str, str
 		stack.append()
 	elif mode == 6: # str, list
@@ -730,7 +811,7 @@ def YOperator(stack, x, y, mode):
 	elif mode == 7: # list, num
 		result = []
 		y = int(y)
-		if y < 1 or y > len(y):
+		if y < 1 or y > len(x):
 			raise ValueError("invalid size for unzipping "+str(y))
 		for i in range(y):
 			index = i
@@ -1006,7 +1087,6 @@ Each value should be an Operator object
 
 ops = {
 	# Nilads
-	';': Operator(';', 0, semicolonOperator),
 	'₵C': Operator('₵C', 0, constCOperator),
 	'₵D': Operator('₵D', 0, constDOperator),
 	'₵E': Operator('₵E', 0, constEOperator),
@@ -1020,6 +1100,7 @@ ops = {
 	'ø': Operator('ø', 0, emptySetOperator),
 	'¶': Operator('¶', 0, pilcrowOperator),
 	'§': Operator('§', 0, sectionOperator),
+	'∇': Operator('∇', 0, nablaOperator),
 	# Monads
 	'!': Operator('!', 1, exclamationOperator),
 	'$': Operator('$', 1, dollarOperator),
@@ -1032,8 +1113,10 @@ ops = {
 	'l': Operator('l', 1, lOperator),
 	'n': Operator('n', 1, nOperator),
 	's': Operator('s', 1, sOperator),
+	't': Operator('t', 1, tOperator),
 	'v': Operator('v', 1, vOperator),
-	'x': Operator('x', 1, xOperator),
+	'w': Operator('w', 1, wOperator),
+	'\\': Operator('\\', 1, backslashOperator),
 	'_': Operator('_', 1, underscoreOperator),
 	'…': Operator('…', 1, lowEllipsisOperator),
 	'┅': Operator('┅', 1, highEllipsisOperator),
@@ -1041,6 +1124,7 @@ ops = {
 	'⌋': Operator('⌋', 1, floorOperator),
 	'⌉': Operator('⌉', 1, ceilOperator),
 	'±': Operator('±', 1, plusMinusOperator),
+	'ż': Operator('ż', 1, zUpDotOperator),
 	'€|': Operator('€|', 1, extPipeOperator),
 	'€[': Operator('€[', 1, extLeftBracketOperator),
 	# Dyads
@@ -1048,7 +1132,9 @@ ops = {
 	'&': Operator('&', 2, ampersandOperator),
 	'*': Operator('*', 2, asteriskOperator),
 	'+': Operator('+', 2, plusOperator),
+	',': Operator(',', 2, commaOperator),
 	'/': Operator('/', 2, slashOperator),
+	';': Operator(';', 2, semicolonOperator),
 	'<': Operator('<', 2, lessThanOperator),
 	'=': Operator('=', 2, equalsOperator),
 	'>': Operator('>', 2, greaterThanOperator),

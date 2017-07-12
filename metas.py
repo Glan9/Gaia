@@ -35,10 +35,13 @@ def peek(stack, ops, mode = None, x = None, y = None):
 		ops[0].execute(stack)
 	elif ops[0].arity == 1:
 		stack.append(x)
+		stack.append(x)
 		ops[0].execute(stack)
 	elif ops[0].arity == 2:
+		stack.append(x)
 		stack.append(y)
 		stack.append(x)
+		stack.append(y)
 		ops[0].execute(stack)
 
 # ?
