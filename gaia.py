@@ -61,37 +61,44 @@ def determineMetaCallStyle(meta, arity, op1, op2 = None):
 		return lambda stack, x, y, mode: meta(stack, ops, mode, x, y)
 
 """
-parseStrings(string, terminator)
+parseString(string, terminator)
 
 string:     The part of the text between the initial opening quote and the ending quote, including additional opening quotes
 terminator: The ending quote
 """
-def parseStrings(string, terminator):
-	strings = string.split('“')
+def parseString(string, terminator):
+	strings = []
+
+	i = 0
+	while i < len(string):
+		if string[i] == '\\':
+			if i < len(string)-1 and string[i+1] in '\\“”‘’„‟':
+				string = string[:i]+string[i+1:]
+		elif string[i] == '“':
+			strings.append(string[:i])
+			string = string[i+1:]
+			i = 0
+		i += 1
+	strings.append(string)
+
 	if terminator == '‘':
 		# Base-250 number
 		for i in range(len(strings)):
 			digits = utilities.codepageEncode(string)
 			strings[i] = sum((250**i)*digits[~i] for i in range(len(digits)))
-		if len(strings) == 1:
-			return operators.Operator('“'+string+'‘', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
-		else:
-			return operators.Operator('“'+string+'‘', 0, ( lambda x: lambda stack: stack.append(x) )(strings) )
 	elif terminator == '’':
 		# List of codepage indices
 		strings = [list(utilities.codepageEncode(string)) for string in strings]
-
-		if len(strings) == 1:
-			return operators.Operator('“'+string+'’', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
-		else:
-			return operators.Operator('“'+string+'’', 0, ( lambda x: lambda stack: stack.append(x) )(strings) )
 	# TODO elif tarminator == '„':
 	else:
 		# Default to being a normal string
-		if len(strings) == 1:
-			return operators.Operator('“'+string+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
-		else:
-			return operators.Operator('“'+string+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings) )
+		terminator = '”'
+
+	# Make it a list only if there's more than 1
+	if len(strings) == 1:
+		return operators.Operator('“'+string+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
+	else:
+		return operators.Operator('“'+string+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings) )
 
 
 
@@ -103,27 +110,29 @@ def decompose(line):
 
 	while len(line) > 0:
 
-		if re.match("^((\\[“”]|[^“])*)([”‘’„‟])", line):
+		if re.match("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", line):
 			# Match an unopened quote
 			#print("Unstarted quote")
-			match = re.match("^((\\[“”]|[^“])*)([”‘’„‟])", line)
+			match = re.match("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", line)
 			string = match.group(1)
-			terminator = match.group(2)
-			func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(string) ))
-			line = re.sub("^((\\[“”]|[^“])*)([”‘’„‟])", '', line)
-		elif re.match("^“([^”‘’„‟]*)([”‘’„‟]|$)", line):
+			terminator = match.group(3)
+
+			func.append(parseString(string, terminator))
+			#func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(string) ))
+			line = re.sub("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", '', line)
+		elif re.match("^“((\\\\[“”‘’„‟]|[^”‘’„‟])*)([”‘’„‟]|$)", line):
 			# Match a normal or unfinished string
 			#print("Normal/unfinished quote")
-			match = re.match("^“([^”‘’„‟]*)([”‘’„‟]|$)", line)
+			match = re.match("^“((\\\\[“”‘’„‟]|[^”‘’„‟])*)([”‘’„‟]|$)", line)
 			string = match.group(1)
-			terminator = match.group(2)
-			func.append(parseStrings(string, terminator))
+			terminator = match.group(3)
+			func.append(parseString(string, terminator))
 			
 			#if len(strings) == 1:
 			#	func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) ))
 			#else:
 			#	func.append(operators.Operator(string, 0, ( lambda x: lambda stack: stack.append(x) )(strings) ))
-			line = re.sub("^“([^”‘’„‟]*)([”‘’„‟]|$)", '', line)
+			line = re.sub("^“((\\\\[“”‘’„‟]|[^”‘’„‟])*)([”‘’„‟]|$)", '', line)
 		elif re.match("^-?(\d+(\.\d+)?|\.\d+)", line):
 			# Match a number literal
 			match = re.match("^-?(\d+(\.\d+)?|\.\d+)", line).group(0)

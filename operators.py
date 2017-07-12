@@ -110,7 +110,9 @@ def incrementWord(word):
 def emptySetOperator(stack):
 	stack.append([])
 
-# empty string operator?
+# Ø
+def emptyStringOperator(stack):
+	stack.append("")
 
 # ¶
 def pilcrowOperator(stack):
@@ -760,8 +762,8 @@ def greaterThanOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
-# Y
-def YOperator(stack, x, y, mode):
+# Z
+def ZOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(utilities.formatNum(x // y))
 		stack.append(utilities.formatNum(x % y))
@@ -1097,6 +1099,7 @@ ops = {
 	'₵X': Operator('₵X', 0, constXOperator),
 	'₵Y': Operator('₵Y', 0, constYOperator),
 	'ø': Operator('ø', 0, emptySetOperator),
+	'Ø': Operator('Ø', 0, emptyStringOperator),
 	'¶': Operator('¶', 0, pilcrowOperator),
 	'§': Operator('§', 0, sectionOperator),
 	'∇': Operator('∇', 0, nablaOperator),
@@ -1137,7 +1140,7 @@ ops = {
 	'<': Operator('<', 2, lessThanOperator),
 	'=': Operator('=', 2, equalsOperator),
 	'>': Operator('>', 2, greaterThanOperator),
-	'Y': Operator('Y', 2, YOperator),
+	'Z': Operator('Z', 2, ZOperator),
 	'^': Operator('^', 2, caretOperator),
 	'|': Operator('|', 2, pipeOperator),
 	'∧': Operator('∧', 2, andOperator),
