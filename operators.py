@@ -295,28 +295,6 @@ def lOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
-# n
-def nOperator(stack, z, mode):
-	if mode == 1:   # num
-		stack.append()
-	elif mode == 2: # str
-		stack.append(z.split('\n'))
-	elif mode == 3: # list
-		stack.append('\n'.join(map(utilities.castToString, z)))
-	else:
-		monadNotImplemented(mode, '')
-
-# s
-def sOperator(stack, z, mode):
-	if mode == 1:   # num
-		stack.append()
-	elif mode == 2: # str
-		stack.append(z.split(' '))
-	elif mode == 3: # list
-		stack.append(' '.join(map(utilities.castToString, z)))
-	else:
-		monadNotImplemented(mode, '')
-
 # t
 def tOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -480,10 +458,32 @@ def plusMinusOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
-# ż
-def zUpDotOperator(stack, z, mode):
+# ṣ
+def sLowDotOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append(utilities.formatNum(z**2))
+		stack.append(utilities.formatNum(math.asin(z)))
+	elif mode == 2: # str
+		stack.append(z.split('\n'))
+	elif mode == 3: # list
+		stack.append('\n'.join(map(utilities.castToString, z)))
+	else:
+		monadNotImplemented(mode, '')
+
+# ṡ
+def sHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.formatNum(math.sin(z)))
+	elif mode == 2: # str
+		stack.append(z.split(' '))
+	elif mode == 3: # list
+		stack.append(' '.join(map(utilities.castToString, z)))
+	else:
+		monadNotImplemented(mode, '')
+
+# ż
+def zHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.formatNum(2**z))
 	elif mode == 2: # str
 		stack.append()
 	elif mode == 3: # list
@@ -1111,8 +1111,6 @@ ops = {
 	'e': Operator('e', 1, eOperator),
 	'i': Operator('i', 1, iOperator),
 	'l': Operator('l', 1, lOperator),
-	'n': Operator('n', 1, nOperator),
-	's': Operator('s', 1, sOperator),
 	't': Operator('t', 1, tOperator),
 	'v': Operator('v', 1, vOperator),
 	'w': Operator('w', 1, wOperator),
@@ -1124,7 +1122,9 @@ ops = {
 	'⌋': Operator('⌋', 1, floorOperator),
 	'⌉': Operator('⌉', 1, ceilOperator),
 	'±': Operator('±', 1, plusMinusOperator),
-	'ż': Operator('ż', 1, zUpDotOperator),
+	'ṣ': Operator('ṣ', 1, sLowDotOperator),
+	'ṡ': Operator('ṡ', 1, sHighDotOperator),
+	'ż': Operator('ż', 1, zHighDotOperator),
 	'€|': Operator('€|', 1, extPipeOperator),
 	'€[': Operator('€[', 1, extLeftBracketOperator),
 	# Dyads
