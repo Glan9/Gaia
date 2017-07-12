@@ -446,8 +446,8 @@ def ceilOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
-# ±
-def plusMinusOperator(stack, z, mode):
+# ọ
+def oLowDotOperator(stack, z, mode):
 	if mode == 1:   # num
 		stack.append(-1 if z < 0 else (1 if z > 0 else 0))
 	elif mode == 2: # str
@@ -460,14 +460,25 @@ def plusMinusOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
-# ṣ
-def sLowDotOperator(stack, z, mode):
+# ḣ
+def hHighDotOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append(utilities.formatNum(math.asin(z)))
+		stack.append(utilities.formatNum(z*2))
 	elif mode == 2: # str
-		stack.append(z.split('\n'))
+		stack.append(z[:-1] if z else "")
 	elif mode == 3: # list
-		stack.append('\n'.join(map(utilities.castToString, z)))
+		stack.append(z[:-1] if z else [])
+	else:
+		monadNotImplemented(mode, '')
+
+# ḥ
+def hLowDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.formatNum(z/2))
+	elif mode == 2: # str
+		stack.append(z[1:] if z else "")
+	elif mode == 3: # list
+		stack.append(z[1:] if z else [])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -479,6 +490,17 @@ def sHighDotOperator(stack, z, mode):
 		stack.append(z.split(' '))
 	elif mode == 3: # list
 		stack.append(' '.join(map(utilities.castToString, z)))
+	else:
+		monadNotImplemented(mode, '')
+
+# ṣ
+def sLowDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.formatNum(math.asin(z)))
+	elif mode == 2: # str
+		stack.append(z.split('\n'))
+	elif mode == 3: # list
+		stack.append('\n'.join(map(utilities.castToString, z)))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1123,9 +1145,11 @@ ops = {
 	'Σ': Operator('Σ', 1, sigmaOperator),
 	'⌋': Operator('⌋', 1, floorOperator),
 	'⌉': Operator('⌉', 1, ceilOperator),
-	'±': Operator('±', 1, plusMinusOperator),
-	'ṣ': Operator('ṣ', 1, sLowDotOperator),
+	'ḣ': Operator('ṡ', 1, hHighDotOperator),
+	'ḥ': Operator('ṣ', 1, hLowDotOperator),
+	'ọ': Operator('ọ', 1, oLowDotOperator),
 	'ṡ': Operator('ṡ', 1, sHighDotOperator),
+	'ṣ': Operator('ṣ', 1, sLowDotOperator),
 	'ż': Operator('ż', 1, zHighDotOperator),
 	'€|': Operator('€|', 1, extPipeOperator),
 	'€[': Operator('€[', 1, extLeftBracketOperator),
