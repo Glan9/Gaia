@@ -939,8 +939,7 @@ def divisionOperator(stack, x, y, mode):
 
 		n = int(n) # Takes an integer specifically as argument
 		if n > len(s) or n < 1:
-			                                          # TODO make this stringRep(s) after I define a custom stringRep function
-			raise ValueError(str(n)+" is not a valid number of splits for "+s+" (length "+str(len(s))+")")
+			raise ValueError(str(n)+" is not a valid number of splits for "+utilities.outputFormat(s)+" (length "+str(len(s))+")")
 
 		cuts = [0]*n
 		result = []
