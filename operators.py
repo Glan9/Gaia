@@ -140,7 +140,7 @@ def constVOperator(stack):
 
 # ₵X
 def constXOperator(stack):
-	stack.append('aeiouy')
+	stack.append('bcdfghjklmnpqrstvwxz')
 
 # ₵C
 def constCOperator(stack):
@@ -148,15 +148,11 @@ def constCOperator(stack):
 
 # ₵Y
 def constYOperator(stack):
-	stack.append('bcdfghjklmnpqrstvwxz')
+	stack.append('aeiouy')
 
 # ₵D
 def constDOperator(stack):
 	stack.append('0123456789')
-
-# ₵P
-def constPOperator(stack):
-	stack.append("""'":;/.,()&!?""")
 
 # ₵Q
 def constQOperator(stack):
