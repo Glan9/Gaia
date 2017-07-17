@@ -44,6 +44,11 @@ def peek(stack, ops, mode = None, x = None, y = None):
 		stack.append(y)
 		ops[0].execute(stack)
 
+# ₓ
+def repeat(stack, ops, mode = None, x = None, y = None):
+	for i in range(x):
+		ops[0].execute(stack)
+
 # ?
 def conditional(stack, ops, mode = None, x = None, y = None):
 	if x:
@@ -71,9 +76,7 @@ def select(stack, ops, mode = None, x = None, y = None):
 
 	elif ops[0].arity == 1:
 
-		if mode != 3:
-			# if x is not a list
-			raise TypeError("argument must be a list")
+		x = utilities.castToList(x)
 
 		for item in x:
 			tempStack = [item]
@@ -120,9 +123,7 @@ def reject(stack, ops, mode = None, x = None, y = None):
 
 	elif ops[0].arity == 1:
 
-		if mode != 3:
-			# if x is not a list
-			raise TypeError("argument must be a list")
+		x = utilities.castToList(x)
 
 		for item in x:
 			tempStack = [item]
@@ -171,7 +172,7 @@ def mapList(stack, ops, mode = None, x = None, y = None):
 
 		if mode != 3:
 			# If x is not a list
-			raise TypeError("argument must be a list")
+			x = utilities.castToList(x)
 
 		for item in x:
 			tempStack = [item]
@@ -220,6 +221,26 @@ def reduceList(stack, ops, mode = None, x = None, y = None):
 			stack.append(i)
 			ops[0].execute(stack)
 
+# ⊣
+def cumulativeReduceList(stack, ops, mode = None, x = None, y = None):
+	if ops[0].arity != 2:
+		raise SyntaxError("⊣ must be combined with a dyad")
+
+	x = utilities.castToList(x)
+
+	reduction = []
+
+	for p in [x[:i] for i in range(1, len(x)+1)]:
+		if len(p) == 0:
+			reduction.append(0)
+		else:
+			reduction.append(p[0])
+			p = p[1:]
+			for i in p:
+				reduction.append(i)
+				ops[0].execute(reduction)
+
+	stack.append(reduction)
 
 # #
 def search(stack, ops, mode = None, x = None, y = None):
@@ -234,7 +255,7 @@ def search(stack, ops, mode = None, x = None, y = None):
 
 		if mode != 1:
 			# if x is not a number
-			raise TypeError("argument must be a number")
+			x = utilities.castToNumber(x)
 
 		while len(result) < int(x):
 			tempStack = [i]
@@ -279,7 +300,7 @@ def search(stack, ops, mode = None, x = None, y = None):
 def vectorize(stack, ops, mode = None, x = None, y = None):
 
 	if ops[0].arity == 0:
-		raise SyntaxError("† can't be paired with a nilad")
+		raise SyntaxError("† can't be combined with a nilad")
 
 	if ops[0].arity == 1:
 		tempStack = [x]
@@ -312,6 +333,33 @@ def vectorize(stack, ops, mode = None, x = None, y = None):
 
 		stack.append(result)
 
+# ‡
+def cartesian(stack, ops, mode = None, x = None, y = None):
+
+	if ops[0].arity == 0:
+		raise SyntaxError("† can't be combined with a nilad")
+
+	if ops[0].arity == 1:
+		# TODO Throw error for now because I don't know what this should do yet
+		raise SyntaxError("‡ can't be combined with a monad")
+
+	if ops[0].arity == 2:
+		result = []
+		tempStack = []
+		row = []
+
+		x = utilities.castToList(x)
+		y = utilities.castToList(y)
+
+		for i in x:
+			for j in y:
+				tempStack = [i, j]
+				ops[0].execute(tempStack)
+				row += tempStack
+			result.append(row)
+			row = []
+
+		stack.append(result)
 
 # ↺
 def whileLoop(stack, ops, mode = None, x = None, y = None):
@@ -370,6 +418,98 @@ def infiniteLoop(stack, ops, mode = None, x = None, y = None):
 	while True:
 		ops[0].execute(stack)
 
+# ∆
+def findIndex(stack, ops, mode = None, x = None, y = None):
+	tempStack = []
+
+	if ops[0].arity == 0:
+		raise SyntaxError("∆ can't be combined with niladic operator "+ops[0].name)
+
+	elif ops[0].arity == 1:
+
+		x = utilities.castToList(x)
+
+		for i in range(len(x)):
+			tempStack = [x[i]]
+			ops[0].execute(tempStack)
+			if tempStack.pop():
+				stack.append(i+1)
+				return
+
+	elif ops[0].arity == 2:
+
+		if mode == 7 or mode == 8 or mode == 9:
+			# if x is a list
+			for i in range(len(x)):
+				tempStack = [x[i], y]
+				ops[0].execute(tempStack)
+				if tempStack.pop():
+					stack.append(i+1)
+					return
+		elif mode == 3 or mode == 6:
+			# if y is a list
+			for i in range(len(y)):
+				tempStack = [x, y[i]]
+				ops[0].execute(tempStack)
+				if tempStack.pop():
+					stack.append(i+1)
+					return
+		else:
+			# if neither is a list
+			x = utilities.castToList(x)
+			for i in range(len(x)):
+				tempStack = [x[i], y]
+				ops[0].execute(tempStack)
+				if tempStack.pop():
+					stack.append(i+1)
+					return
+
+
+# ∇
+def findElement(stack, ops, mode = None, x = None, y = None):
+	tempStack = []
+
+	if ops[0].arity == 0:
+		raise SyntaxError("∇ can't be combined with niladic operator "+ops[0].name)
+
+	elif ops[0].arity == 1:
+
+		x = utilities.castToList(x)
+
+		for i in x:
+			tempStack = [i]
+			ops[0].execute(tempStack)
+			if tempStack.pop():
+				stack.append(i)
+				return
+
+	elif ops[0].arity == 2:
+
+		if mode == 7 or mode == 8 or mode == 9:
+			# if x is a list
+			for i in x:
+				tempStack = [i, y]
+				ops[0].execute(tempStack)
+				if tempStack.pop():
+					stack.append(i)
+					return
+		elif mode == 3 or mode == 6:
+			# if y is a list
+			for i in y:
+				tempStack = [x, i]
+				ops[0].execute(tempStack)
+				if tempStack.pop():
+					stack.append(i)
+					return
+		else:
+			# if neither is a list
+			x = utilities.castToList(x)
+			for i in x:
+				tempStack = [i, y]
+				ops[0].execute(tempStack)
+				if tempStack.pop():
+					stack.append(i)
+					return
 
 
 """
@@ -384,6 +524,7 @@ Arity is either fixed (i.e. 1 for things like conditional), or -1 if the arity i
 metas = {
 	'ₔ': ['ₔ', 1, -1, swappedArgs],
 	'₌': ['₌', 1, -1, peek],
+	'ₓ': ['ₓ', 1, 1, repeat],
 	'?': ['?', 2, 1, conditional],
 	'¿': ['¿', 1, 1, ifTrue],
 	'¡': ['¡', 1, 1, ifFalse],
@@ -391,9 +532,13 @@ metas = {
 	'⁈': ['⁈', 1, -1, reject],
 	'¦': ['¦', 1, -1, mapList],
 	'⊢': ['⊢', 1, 1, reduceList],
+	'⊣': ['⊣', 1, 1, cumulativeReduceList],
 	'#': ['#', 1, -1, search],
 	'†': ['†', 1, 2, vectorize],
+	'‡': ['‡', 1, 2, cartesian],
 	'↺': ['↺', 2, 0, whileLoop],
 	'↻': ['↻', 2, 0, untilLoop],
-	'∞': ['∞', 1, 0, infiniteLoop]
+	'∞': ['∞', 1, 0, infiniteLoop],
+	'∆': ['∆', 1, -1, findIndex],
+	'∇': ['∇', 1, -1, findElement]
 }

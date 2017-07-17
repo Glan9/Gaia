@@ -4,11 +4,10 @@ import sys
 import re
 import math
 
+
 import operators
 import metas
 import utilities
-
-
 
 stack = []
 arrayMarkers = [] # Used to mark the positions of arrays being opened, with '['
@@ -89,14 +88,41 @@ def parseString(string, terminator):
 	elif terminator == '’':
 		# List of codepage indices
 		strings = [list(utilities.codepageEncode(string)) for string in strings]
-	# TODO elif tarminator == '„':
+	elif terminator == '„':
+		newStrings = [decompose(s) for s in strings]
+
+		# Check if everything is the same arity
+		arity = None
+		for s in newStrings:
+			if len(s) > 0:
+				arity = s[0].arity if arity == None else arity # Only set it if it hasn't been set yet
+				for op in s:
+					if op.arity != arity:
+						raise SyntaxError("all operators in a “...„ string must have the same arity")
+
+		if len(newStrings) == 1:
+			if arity == 0:
+				return operators.Operator('“'+strings[0]+'„', 0, (lambda string: lambda stack: stack.append(runOperatorString(string)))(newStrings[0]))
+			elif arity == 1:
+				return operators.Operator('“'+strings[0]+'„', 1, (lambda string: lambda stack, z, mode: stack.append(runOperatorString(string, z)))(newStrings[0]))
+			elif arity == 2:
+				return operators.Operator('“'+strings[0]+'„', 2, (lambda string: lambda stack, x, y, mode: stack.append(runOperatorString(string, x, y)))(newStrings[0]))
+		else:
+			if arity == 0:
+				return operators.Operator('“'+strings[0]+'„', 0, (lambda strings: lambda stack: stack.append([runOperatorString(s) for s in strings]) )(newStrings))
+			elif arity == 1:
+				return operators.Operator('“'+strings[0]+'„', 1, (lambda strings: lambda stack, z, mode: stack.append([runOperatorString(s, z) for s in strings]) )(newStrings))
+			elif arity == 2:
+				return operators.Operator('“'+strings[0]+'„', 2, (lambda strings: lambda stack, x, y, mode: stack.append([runOperatorString(s, x, y) for s in strings]) )(newStrings))
+
+
 	else:
 		# Default to being a normal string
 		terminator = '”'
 
 	# Make it a list only if there's more than 1
 	if len(strings) == 1:
-		return operators.Operator('“'+string+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
+		return operators.Operator('“'+strings[0]+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
 	else:
 		return operators.Operator('“'+string+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings) )
 
@@ -108,18 +134,19 @@ Break a line (as a string) down into operators
 def decompose(line):
 	func = []
 
+	if re.match("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", line):
+		# Match an unopened string at the start of the line
+		match = re.match("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", line)
+		string = match.group(1)
+		terminator = match.group(3)
+
+		func.append(parseString(string, terminator))
+		
+		line = re.sub("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", '', line)
+
 	while len(line) > 0:
 
-		if re.match("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", line):
-			# Match an unopened quote
-			match = re.match("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", line)
-			string = match.group(1)
-			terminator = match.group(3)
-
-			func.append(parseString(string, terminator))
-			
-			line = re.sub("^((\\\\[“”‘’„‟]|[^“”‘’„‟])*)([”‘’„‟])", '', line)
-		elif re.match("^“((\\\\[“”‘’„‟]|[^”‘’„‟])*)([”‘’„‟]|$)", line):
+		if re.match("^“((\\\\[“”‘’„‟]|[^”‘’„‟])*)([”‘’„‟]|$)", line):
 			# Match a normal or unfinished string
 			match = re.match("^“((\\\\[“”‘’„‟]|[^”‘’„‟])*)([”‘’„‟]|$)", line)
 			string = match.group(1)
@@ -276,15 +303,31 @@ stack: The stack to run on
 func:  The function to run
 """
 def runFunction(stack, func):
+	global arrayMarkers
+
 	for op in func:
 		try:
 			op.execute(stack)
+
+			arrayMarkers = [max(min(i, len(stack)-op.arity), 0) for i in arrayMarkers]
 		except Exception as error:
 			sys.stderr.write("Error while executing operator "+op.name+": "+str(error)+'\n')
 			exit(1)
 
 	return stack
 
+
+def runOperatorString(string, x = None, y = None):
+	tempStack = []
+
+	for op in string:
+		if x != None:
+			tempStack.append(x)
+		if y != None:
+			tempStack.append(y)
+		op.execute(tempStack)
+
+	return tempStack
 
 ###########################
 

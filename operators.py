@@ -3,6 +3,8 @@
 import sys
 import re
 import math
+import datetime
+import time
 
 import utilities
 
@@ -122,8 +124,8 @@ def pilcrowOperator(stack):
 def sectionOperator(stack):
 	stack.append(' ')
 
-# ∇
-def nablaOperator(stack):
+# @
+def atOperator(stack):
 	stack.append(utilities.getInput())
 
 # ₵L
@@ -154,16 +156,20 @@ def constYOperator(stack):
 def constDOperator(stack):
 	stack.append('0123456789')
 
+# ₵H
+def constHOperator(stack):
+	stack.append('0123456789ABCDEF')
+
 # ₵Q
 def constQOperator(stack):
 	stack.append(['qwertyuiop', 'asdfghjkl', 'zxcvbnm'])
 
-# 
-def tenOperator(stack):
+# ₸
+def struckTOperator(stack):
 	stack.append(10)
 
-# 
-def hundredOperator(stack):
+# ℍ
+def struckHOperator(stack):
 	stack.append(100)
 
 # ₵P
@@ -174,9 +180,146 @@ def constPOperator(stack):
 def constEOperator(stack):
 	stack.append(math.e)
 
+# ∂a
+def dateaOperator(stack):
+	stack.append(1 if datetime.datetime.today().hour >= 12 else 0)
 
-# date/time oeprators, extensive like in EXP
-# timestamp (since epoch)
+# ∂A
+def dateAOperator(stack):
+	stack.append("PM" if datetime.datetime.today().hour >= 12 else "AM")
+
+# ∂d
+def datedOperator(stack):
+	stack.append(datetime.datetime.today().day)
+
+# ∂D
+def dateDOperator(stack):
+	stack.append("{:0>2}".format(datetime.datetime.today().day))
+
+# ∂h
+def datehOperator(stack):
+	stack.append(datetime.datetime.today().hour)
+
+# ∂H
+def dateHOperator(stack):
+	stack.append("{:0>2}".format(datetime.datetime.today().hour))
+
+# ∂i
+def dateiOperator(stack):
+	stack.append(datetime.datetime.today().hour%12 or 12)
+
+# ∂I
+def dateIOperator(stack):
+	stack.append("{:0>2}".format(datetime.datetime.today().hour%12 or 12))
+
+# ∂k
+def datekOperator(stack):
+	stack.append([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])
+
+# ∂K
+def dateKOperator(stack):
+	stack.append([31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])
+
+# ∂l
+def datelOperator(stack):
+	year = datetime.datetime.today().year
+	stack.append(1 if ((year % 4 == 0 and year % 100 != 0) or year % 400 == 0) else 0)
+
+# ∂L
+def dateLOperator(stack):
+	year = datetime.datetime.today().year
+	while not ((year % 4 == 0 and year % 100 != 0) or year % 400 == 0):
+		year += 1
+	stack.append(year)
+
+# ∂m
+def datemOperator(stack):
+	stack.append(datetime.datetime.today().month)
+
+# ∂M
+def dateMOperator(stack):
+	stack.append("{:0>2}".format(datetime.datetime.today().month))
+
+# ∂n
+def datenOperator(stack):
+	stack.append(datetime.datetime.today().minute)
+
+# ∂N
+def dateNOperator(stack):
+	stack.append("{:0>2}".format(datetime.datetime.today().minute))
+
+# ∂o
+def dateoOperator(stack):
+	stack.append(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"])
+
+# ∂O
+def dateOOperator(stack):
+	stack.append(["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"])
+
+# ∂q
+def dateqOperator(stack):
+	stack.append(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
+
+# ∂Q
+def dateQOperator(stack):
+	stack.append(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"])
+
+# ∂t
+def datetOperator(stack):
+	stack.append([datetime.datetime.today().hour, datetime.datetime.today().minute, datetime.datetime.today().second])
+
+# ∂T
+def dateTOperator(stack):
+	stack.append([datetime.datetime.today().hour%12 or 12, 1 if datetime.datetime.today().hour >= 12 else 0, datetime.datetime.today().minute, datetime.datetime.today().second])
+
+# ∂s
+def datesOperator(stack):
+	stack.append(datetime.datetime.today().second)
+
+# ∂S
+def dateSOperator(stack):
+	stack.append("{:0>2}".format(datetime.datetime.today().second))
+
+# ∂u
+def dateuOperator(stack):
+	stack.append(datetime.datetime.today().microsecond//1000)
+
+# ∂U
+def dateUOperator(stack):
+	stack.append(datetime.datetime.today().microsecond)
+
+# ∂w
+def datewOperator(stack):
+	stack.append(datetime.datetime.today().isoweekday()%7+1)
+
+# ∂W
+def dateWOperator(stack):
+	stack.append(datetime.datetime.today().isoweekday())
+
+# ∂x
+def datexOperator(stack):
+	stack.append([datetime.datetime.today().year, datetime.datetime.today().month, datetime.datetime.today().day])
+
+# ∂X
+def dateXOperator(stack):
+	d = datetime.datetime.today()
+	stack.append([d.year, d.month, d.today().day, d.isoweekday()%7+1, d.hour, d.minute, d.second, d.microsecond//1000])
+
+# ∂y
+def dateyOperator(stack):
+	stack.append(datetime.datetime.today().year)
+
+# ∂Y
+def dateYOperator(stack):
+	stack.append(datetime.datetime.today().year%100)
+
+# ∂z
+def datezOperator(stack):
+	stack.append(time.timezone//-3600)
+
+# ∂Z
+def dateZOperator(stack):
+	stack.append(int(time.time()*1000))
 
 ''' MONADS '''
 
@@ -216,7 +359,7 @@ def dollarOperator(stack, z, mode):
 # (
 def leftParenthesisOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append(utitlities.formatNum(z-1))
+		stack.append(utilities.formatNum(z-1))
 	elif mode == 2: # str
 		if len(z) > 0:
 			stack.append(z[-1])
@@ -229,7 +372,7 @@ def leftParenthesisOperator(stack, z, mode):
 # )
 def rightParenthesisOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append(utitlities.formatNum(z+1))
+		stack.append(utilities.formatNum(z+1))
 	elif mode == 2: # str
 		if len(z) > 0:
 			stack.append(z[-1])
@@ -516,6 +659,41 @@ def tHighDotOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# ẏ
+def yHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append()
+	elif mode == 2: # str
+		result = []
+
+		currentRun = None
+		start = 0
+		for i in range(len(z)):
+			if currentRun == None:
+				currentRun = z[i]
+			if z[i] != currentRun:
+				currentRun = z[i]
+				result.append(z[start:i])
+				start = i
+
+		stack.append(result)
+	elif mode == 3: # list
+		result = []
+
+		currentRun = None
+		start = 0
+		for i in range(len(z)):
+			if currentRun == None:
+				currentRun = z[i]
+			if z[i] != currentRun:
+				currentRun = z[i]
+				result.append(z[start:i])
+				start = i
+
+		stack.append(result)
+	else:
+		monadNotImplemented(mode, '')
+
 # ż
 def zHighDotOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -536,7 +714,11 @@ def extLeftBracketOperator(stack, z, mode):
 	elif mode == 2: # str
 		stack.append()
 	elif mode == 3: # list
-		stack.append([re.sub("^\s*([\s\S]*?)\s*$", "\g<1>", utilities.castToString(i)) for i in z])
+		z = [re.sub("^\s*([\s\S]*?)\s*$", "\g<1>", utilities.castToString(i)) for i in z]
+		maxLength = max(len(i) for i in z)
+
+		result = [i+(maxLength-len(i))*' ' for i in z]
+		stack.append(result)
 	else:
 		monadNotImplemented(mode, '')
 
@@ -555,6 +737,20 @@ def extPipeOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# €]
+def extRightBracketOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append()
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		z = [re.sub("^\s*([\s\S]*?)\s*$", "\g<1>", utilities.castToString(i)) for i in z]
+		maxLength = max(len(i) for i in z)
+
+		result = [(maxLength-len(i))*' '+i for i in z]
+		stack.append(result)
+	else:
+		monadNotImplemented(mode, '')
 
 ''' DYADS '''
 
@@ -1033,8 +1229,8 @@ def minusOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
-# ∈
-def elementOfOperator(stack, x, y, mode):
+# Ė
+def EHighDotOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(1 if x % y == 0 else 0)
 	elif mode == 2: # num, str
@@ -1132,11 +1328,47 @@ ops = {
 	'₵V': Operator('₵V', 0, constVOperator),
 	'₵X': Operator('₵X', 0, constXOperator),
 	'₵Y': Operator('₵Y', 0, constYOperator),
+	'∂A': Operator('∂A', 0, dateAOperator),
+	'∂a': Operator('∂a', 0, dateaOperator),
+	'∂D': Operator('∂D', 0, dateDOperator),
+	'∂d': Operator('∂d', 0, datedOperator),
+	'∂H': Operator('∂H', 0, dateHOperator),
+	'∂h': Operator('∂h', 0, datehOperator),
+	'∂I': Operator('∂I', 0, dateIOperator),
+	'∂i': Operator('∂i', 0, dateiOperator),
+	'∂K': Operator('∂K', 0, dateKOperator),
+	'∂k': Operator('∂k', 0, datekOperator),
+	'∂L': Operator('∂L', 0, dateLOperator),
+	'∂l': Operator('∂l', 0, datelOperator),
+	'∂M': Operator('∂M', 0, dateMOperator),
+	'∂m': Operator('∂m', 0, datemOperator),
+	'∂N': Operator('∂N', 0, dateNOperator),
+	'∂n': Operator('∂n', 0, datenOperator),
+	'∂O': Operator('∂O', 0, dateOOperator),
+	'∂o': Operator('∂o', 0, dateoOperator),
+	'∂Q': Operator('∂Q', 0, dateQOperator),
+	'∂q': Operator('∂q', 0, dateqOperator),
+	'∂S': Operator('∂S', 0, dateSOperator),
+	'∂s': Operator('∂s', 0, datesOperator),
+	'∂T': Operator('∂T', 0, dateTOperator),
+	'∂t': Operator('∂t', 0, datetOperator),
+	'∂U': Operator('∂U', 0, dateUOperator),
+	'∂u': Operator('∂u', 0, dateuOperator),
+	'∂W': Operator('∂W', 0, dateWOperator),
+	'∂w': Operator('∂w', 0, datewOperator),
+	'∂X': Operator('∂X', 0, dateXOperator),
+	'∂x': Operator('∂x', 0, datexOperator),
+	'∂Y': Operator('∂Y', 0, dateYOperator),
+	'∂y': Operator('∂y', 0, dateyOperator),
+	'∂Z': Operator('∂Z', 0, dateZOperator),
+	'∂z': Operator('∂z', 0, datezOperator),
 	'ø': Operator('ø', 0, emptySetOperator),
 	'Ø': Operator('Ø', 0, emptyStringOperator),
+	'₸': Operator('₸', 0, struckTOperator),
+	'ℍ': Operator('ℍ', 0, struckHOperator),
 	'¶': Operator('¶', 0, pilcrowOperator),
 	'§': Operator('§', 0, sectionOperator),
-	'∇': Operator('∇', 0, nablaOperator),
+	'@': Operator('@', 0, atOperator),
 	# Monads
 	'!': Operator('!', 1, exclamationOperator),
 	'$': Operator('$', 1, dollarOperator),
@@ -1164,9 +1396,11 @@ ops = {
 	'ṡ': Operator('ṡ', 1, sHighDotOperator),
 	'ṣ': Operator('ṣ', 1, sLowDotOperator),
 	'ṫ': Operator('ṫ', 1, tHighDotOperator),
+	'ẏ': Operator('ẏ', 1, yHighDotOperator),
 	'ż': Operator('ż', 1, zHighDotOperator),
 	'€|': Operator('€|', 1, extPipeOperator),
 	'€[': Operator('€[', 1, extLeftBracketOperator),
+	'€]': Operator('€]', 1, extRightBracketOperator),
 	# Dyads
 	'%': Operator('%', 2, percentOperator),
 	'&': Operator('&', 2, ampersandOperator),
@@ -1186,8 +1420,8 @@ ops = {
 	'⁻': Operator('⁻', 2, minusOperator),
 	'×': Operator('×', 2, timesOperator),
 	'÷': Operator('÷', 2, divisionOperator),
-	'∈': Operator('∈', 2, elementOfOperator),
-	'¤': Operator('¤', 2, currencyOperator)
+	'¤': Operator('¤', 2, currencyOperator),
+	'Ė': Operator('Ė', 2, EHighDotOperator)
 
 
 }
