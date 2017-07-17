@@ -5,6 +5,8 @@ import re
 import math
 import datetime
 import time
+import functools
+import itertools
 
 import utilities
 
@@ -390,6 +392,17 @@ def colonOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# b
+def bOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append() # TODO
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		stack.append(sum(z[~i]*(2**i) for i in range(len(z))))
+	else:
+		monadNotImplemented(mode, '')
+
 # e
 def eOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -400,6 +413,17 @@ def eOperator(stack, z, mode):
 		[stack.append(i) for i in z]
 	else:
 		monadNotImplemented(mode, 'e')
+
+# f
+def fOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(math.factorial(int(z)))
+	elif mode == 2: # str
+		stack.append([''.join(p) for p in itertools.permutations(z)])
+	elif mode == 3: # list
+		stack.append([list(p) for p in itertools.permutations(z)])
+	else:
+		monadNotImplemented(mode, '')
 
 # i
 def iOperator(stack, z, mode):
@@ -432,6 +456,33 @@ def qOperator(stack, z, mode):
 	if mode > 0:   # any types
 		print(utilities.outputFormat(z))
 		utilities.manualOutput = True
+	else:
+		monadNotImplemented(mode, '')
+
+# r
+def rOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(int(z)%2)
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		result = []
+		for i in range(len(z)):
+			for j in range(len(z)):
+				if i != j and [z[j], z[i]] not in result:
+					result.append([z[i], z[j]])
+		stack.append(result)
+	else:
+		monadNotImplemented(mode, '')
+
+# s
+def sOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.formatNum(z*z))
+	elif mode == 2: # str
+		stack.append('\n'.join(z for i in z))
+	elif mode == 3: # list
+		stack.append([z for i in z])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -490,6 +541,17 @@ def underscoreOperator(stack, z, mode):
 		stack.append()  # Not planned yet
 	elif mode == 3: # list
 		stack.append(utilities.flatten(z))
+	else:
+		monadNotImplemented(mode, '')
+
+# ~
+def tildeOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(~int(z))
+	elif mode == 2: # str
+		stack.append(''.join([c.upper() if c.islower() else (c.lower() if c.isupper() else c) for c in z]))
+	elif mode == 3: # list
+		stack.append()
 	else:
 		monadNotImplemented(mode, '')
 
@@ -581,6 +643,64 @@ def ceilOperator(stack, z, mode):
 		if len(z) > 0:
 			stack.append(z[:-1])
 			stack.append(z[-1])
+	else:
+		monadNotImplemented(mode, '')
+
+# Σ
+def sigmaOperator(stack, z, mode):
+	if mode == 1:   # num
+		tempStack = []
+		dollarOperator(tempStack, z, mode)
+		stack.append(sum(tempStack[0]))
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		stack.append(sum(utilities.castToNumber(i) for i in utilities.flatten(z)))
+	else:
+		monadNotImplemented(mode, '')
+
+# Π
+def piOperator(stack, z, mode):
+	if mode == 1:   # num
+		tempStack = []
+		dollarOperator(tempStack, z, mode)
+		stack.append(functools.reduce(lambda a,b:a*b, tempStack[0]))
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		stack.append(functools.reduce(lambda a,b:a*b, [utilities.castToNumber(i) for i in utilities.flatten(z)]))
+	else:
+		monadNotImplemented(mode, '')
+
+# ‼
+def doubleExclamationOperator(stack, z, mode):
+	if mode > 0:   # Any types
+		stack.append(1 if z else 0)
+	else:
+		monadNotImplemented(mode, '')
+
+# ḟ
+def fHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		def subfactorial(n):
+			soFar = [1, 0]
+			if n < 0:
+				raise ValueError("can't comput subfactorial of negative number")
+			if n < 2:
+				return soFar[n]
+
+			i = 2
+			while i <= n:
+				soFar.append((i-1)*(soFar[i-1]+soFar[i-2]))
+				i += 1
+
+			return soFar[-1]
+
+		stack.append(subfactorial(int(z)))
+	elif mode == 2: # str
+		stack.append([''.join(p) for p in itertools.permutations(z) if all(''.join(p)[i] != z[i] for i in range(len(z)))])
+	elif mode == 3: # list
+		stack.append([list(p) for p in itertools.permutations(z) if all(list(p)[i] != z[i] for i in range(len(z)))])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1375,23 +1495,32 @@ ops = {
 	'(': Operator('(', 1, leftParenthesisOperator),
 	')': Operator(')', 1, rightParenthesisOperator),
 	':': Operator(':', 1, colonOperator),
+	'b': Operator('b', 1, bOperator),
 	'e': Operator('e', 1, eOperator),
+	'f': Operator('f', 1, fOperator),
 	'i': Operator('i', 1, iOperator),
 	'l': Operator('l', 1, lOperator),
 	'p': Operator('p', 1, pOperator),
 	'q': Operator('q', 1, qOperator),
+	'r': Operator('r', 1, rOperator),
+	's': Operator('s', 1, sOperator),
 	't': Operator('t', 1, tOperator),
 	'v': Operator('v', 1, vOperator),
 	'w': Operator('w', 1, wOperator),
 	'\\': Operator('\\', 1, backslashOperator),
 	'_': Operator('_', 1, underscoreOperator),
+	'~': Operator('~', 1, tildeOperator),
 	'…': Operator('…', 1, lowEllipsisOperator),
 	'┅': Operator('┅', 1, highEllipsisOperator),
 	'Σ': Operator('Σ', 1, sigmaOperator),
+	'Π': Operator('Π', 1, piOperator),
+	'‼': Operator('‼', 1, doubleExclamationOperator),
 	'⌋': Operator('⌋', 1, floorOperator),
 	'⌉': Operator('⌉', 1, ceilOperator),
-	'ḣ': Operator('ṡ', 1, hHighDotOperator),
-	'ḥ': Operator('ṣ', 1, hLowDotOperator),
+	'Σ': Operator('Σ', 1, sigmaOperator),
+	'ḟ': Operator('ḟ', 1, fHighDotOperator),
+	'ḣ': Operator('ḣ', 1, hHighDotOperator),
+	'ḥ': Operator('ḥ', 1, hLowDotOperator),
 	'ọ': Operator('ọ', 1, oLowDotOperator),
 	'ṡ': Operator('ṡ', 1, sHighDotOperator),
 	'ṣ': Operator('ṣ', 1, sLowDotOperator),

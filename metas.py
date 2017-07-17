@@ -464,7 +464,6 @@ def findIndex(stack, ops, mode = None, x = None, y = None):
 					stack.append(i+1)
 					return
 
-
 # ∇
 def findElement(stack, ops, mode = None, x = None, y = None):
 	tempStack = []
