@@ -395,11 +395,23 @@ def colonOperator(stack, z, mode):
 # b
 def bOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append() # TODO
+		stack.append(utilities.toBase(int(z), 2))
 	elif mode == 2: # str
 		stack.append()
 	elif mode == 3: # list
-		stack.append(sum(z[~i]*(2**i) for i in range(len(z))))
+		stack.append(utilities.fromBase([utilities.castToNumber(i) for i in z], 2))
+	else:
+		monadNotImplemented(mode, '')
+
+# d
+def dOperator(stack, z, mode):
+	if mode == 1:   # num
+		z = abs(int(z))
+		stack.append([i for i in range(1, z+1) if z%i==0])
+	elif mode == 2: # str
+		stack.append(utilities.castToNumber(z))
+	elif mode == 3: # list
+		stack.append(utilities.castToNumber(z))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -422,6 +434,17 @@ def fOperator(stack, z, mode):
 		stack.append([''.join(p) for p in itertools.permutations(z)])
 	elif mode == 3: # list
 		stack.append([list(p) for p in itertools.permutations(z)])
+	else:
+		monadNotImplemented(mode, '')
+
+# h
+def hOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.toBase(int(z), 16))
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		stack.append(utilities.fromBase(z, 16))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -679,6 +702,114 @@ def doubleExclamationOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# ḋ
+def dHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		z = int(z)
+		if z < 4:
+			stack.append([z])
+		p = 2
+		result = []
+		primes = [2] # The primes we know so far, just to make finding successive primes faster
+		while z > 1:
+			count = 0
+			while z%p == 0:
+				z //= p
+				count += 1
+			if count > 0:
+				result.append([p, count])
+			p += 1
+			while not all(p%d for d in primes): 
+				# We only need to check divisibility with other primes, not even number
+				p += 1
+			primes.append(p)
+		stack.append(result)
+	elif mode == 2 or mode == 3: # str or list
+		if len(z)==0:
+			stack.append([])
+		result = []
+		for i in range(len(z)):
+			for j in range(len(z), 0, -1):
+				if i < j:
+					result.append(z[i:j])
+		stack.append(result)
+	else:
+		monadNotImplemented(mode, '')
+
+# ḍ
+def dLowDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		z = int(z)
+		if z < 4:
+			stack.append([z])
+		p = 2
+		result = []
+		primes = [2] # The primes we know so far, just to make finding successive primes faster
+		while z > 1:
+			while z%p == 0:
+				result.append(p)
+				z //= p
+			p += 1
+			while not all(p%d for d in primes): 
+				# We only need to check divisibility with other primes, not even number
+				p += 1
+			primes.append(p)
+		stack.append(result)
+	elif mode == 2 or mode == 3: # str or list
+		def partitions(z):
+			if len(z) == 0:
+				return [[]]
+			if len(z) == 1:
+				return [[z]]
+			return [[z[:i]]+t for i in range(1, len(z)+1) for t in partitions(z[i:])]
+		stack.append(partitions(z))
+	else:
+		monadNotImplemented(mode, '')
+
+# ė
+def eHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.formatNum(math.cos(z)))
+	elif mode == 2 or mode == 3: # str or list
+		if len(z) == 0:
+			stack.append([])
+		else:
+			current = None
+			count = 0
+			result = []
+			for i in z:
+				if current != i:
+					if current != None:
+						result.append([count, current])
+					current = i
+					count = 1
+				else:
+					count += 1
+			stack.append(result)
+	else:
+		monadNotImplemented(mode, '')
+
+# ẹ
+def eLowDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.formatNum(math.acos(z)))
+	elif mode == 2 or mode == 3: # str or list
+		if len(z) == 0:
+			stack.append([])
+		else:
+			result = ""
+			for i in z:
+				i = utilities.castToList(i)
+				if len(i) >= 2:
+					if type(i[1]) == str and type(result) == str:
+						result += (i[1] * utilities.castToNumber(i[0]))
+					else:
+						result = list(result)
+						result += [i[1]] * utilities.castToNumber(i[0])
+			stack.append(result)
+	else:
+		monadNotImplemented(mode, '')
+
 # ḟ
 def fHighDotOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -737,6 +868,43 @@ def hLowDotOperator(stack, z, mode):
 		stack.append(z[1:] if z else "")
 	elif mode == 3: # list
 		stack.append(z[1:] if z else [])
+	else:
+		monadNotImplemented(mode, '')
+
+# ṅ
+def nHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		z = int(z)
+		primes = []
+		p = 1
+		while len(primes) < z:
+			while p == 1 or not all(p%d for d in primes):
+				p += 1
+			primes.append(p)
+		stack.append(primes)
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		stack.append(1 if all(z) and len(z) > 0 else 0)
+	else:
+		monadNotImplemented(mode, '')
+
+# ṇ
+def nLowDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		z = int(z)
+		primes = []
+		p = 1
+		while len(primes) < z:
+			while p == 1 or not all(p%d for d in primes):
+				p += 1
+			primes.append(p)
+		if primes:
+			stack.append(primes[-1])
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		stack.append(1 if all(not i for i in z) else 0)
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1496,8 +1664,10 @@ ops = {
 	')': Operator(')', 1, rightParenthesisOperator),
 	':': Operator(':', 1, colonOperator),
 	'b': Operator('b', 1, bOperator),
+	'd': Operator('d', 1, dOperator),
 	'e': Operator('e', 1, eOperator),
 	'f': Operator('f', 1, fOperator),
+	'h': Operator('h', 1, hOperator),
 	'i': Operator('i', 1, iOperator),
 	'l': Operator('l', 1, lOperator),
 	'p': Operator('p', 1, pOperator),
@@ -1518,9 +1688,15 @@ ops = {
 	'⌋': Operator('⌋', 1, floorOperator),
 	'⌉': Operator('⌉', 1, ceilOperator),
 	'Σ': Operator('Σ', 1, sigmaOperator),
+	'ḋ': Operator('ḋ', 1, dHighDotOperator),
+	'ḍ': Operator('ḍ', 1, dLowDotOperator),
+	'ė': Operator('ė', 1, eHighDotOperator),
+	'ẹ': Operator('ẹ', 1, eLowDotOperator),
 	'ḟ': Operator('ḟ', 1, fHighDotOperator),
 	'ḣ': Operator('ḣ', 1, hHighDotOperator),
 	'ḥ': Operator('ḥ', 1, hLowDotOperator),
+	'ṅ': Operator('ṅ', 1, nHighDotOperator),
+	'ṇ': Operator('ṇ', 1, nLowDotOperator),
 	'ọ': Operator('ọ', 1, oLowDotOperator),
 	'ṡ': Operator('ṡ', 1, sHighDotOperator),
 	'ṣ': Operator('ṣ', 1, sLowDotOperator),

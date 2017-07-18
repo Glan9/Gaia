@@ -3,9 +3,10 @@ import re
 import array
 
 codepage = """₀₁₂₃₄₅₆₇₈₉ₓ₌ₔ∂€₵⟨⟩⟪⟫⇑⇓⇐⇒↑↓←→⇈⇊⇇⇉ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
-«»…┅⌋⌉⊂⊃∧∨ΣΠø×÷⁻∈±¤¶§√∆∇ȦĊḊĖḞĠḢṀṄȮṖṘṠṪẆẊẎŻȧċḋėḟġḣṁṅȯṗṙṡṫẇẋẏżẠḄḌẸḤḲḶṂṆỌṚṢṬỤṾẈỴẒạḅḍẹḥḳḷṃṇọṛṣṭụṿẉỵẓ¿¡⁇⁈↻↺∞¦†‡♀♂⊢⊣            “”‘’„‟""" # TODO: finish code page
+«»…┅⌋⌉⊂⊃∧∨ΣΠ‼×÷⁻øØ¤¶§ ₸ℍȦĊḊĖḞĠḢṀṄȮṖṘṠṪẆẊẎŻȧċḋėḟġḣṁṅȯṗṙṡṫẇẋẏżẠḄḌẸḤḲḶṂṆỌṚṢṬỤṾẈỴẒạḅḍẹḥḳḷṃṇọṛṣṭụṿẉỵẓ¿¡⁇⁈↻↺∞¦†‡∆∇⊢⊣‖           “”‘’„‟""" # TODO: finish code page
 
 manualOutput = False
+inputs = []
 
 def flatten(l):
 	result = []
@@ -18,17 +19,45 @@ def flatten(l):
 			result.append(i)
 	return result
 
+def toBase(num, base):
+	sign = -1 if num < 0 and base > 0 else 1
+	num = abs(num)
 
+	if num == 0:
+		return []
+	if base == 0:
+		return [num]
+	if base == 1:
+		return [sign]*num
+
+	digits = []
+	while num:
+		num, digit = divmod(num, base)
+		if digit < 0:
+			num += 1
+			digit -= base
+		digits.insert(0, digit*sign)
+
+	return digits
+
+def fromBase(digits, base):
+	return sum(digits[~i]*(base**i) for i in range(len(digits)))
 
 def formatNum(num):
 	return int(num) if num == int(num) else num
 
 def getInput():
-	line = input().strip()
-	if re.match("^-?(\d+(\.\d+)?|\.\d+)$", line):
-		return formatNum(float(line))
-	else:
-		return line
+	try:
+		line = input().strip()
+		value = None
+		if re.match("^-?(\d+(\.\d+)?|\.\d+)$", line):
+			value = formatNum(float(line))
+		else:
+			value = line
+		inputs.append(value)
+		return value
+	except EOFError:
+		return inputs[-1]
 	## TODO: Finish this function (add list parsing?)
 
 def codepageEncode(code):
@@ -75,12 +104,7 @@ def castToNumber(v):
 
 		return 0 if match == None else formatNum(float(match.group(1)))
 	elif type(v) == list:
-		result = 0
-		v = v[::-1]
-		while v:
-			result *= 10
-			result += castToNumber(v.pop())
-		return result
+		return fromBase([castToNumber(d) for d in v], 10)
 
 def castToString(v):
 	if type(v) == int or type(v) == float:
