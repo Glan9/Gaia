@@ -7,6 +7,7 @@ import datetime
 import time
 import functools
 import itertools
+import random
 
 import utilities
 
@@ -708,21 +709,16 @@ def dHighDotOperator(stack, z, mode):
 		z = int(z)
 		if z < 4:
 			stack.append([z])
-		p = 2
+		p = 0
 		result = []
-		primes = [2] # The primes we know so far, just to make finding successive primes faster
 		while z > 1:
 			count = 0
-			while z%p == 0:
-				z //= p
+			while z%utilities.getPrime(p) == 0:
+				z //= utilities.getPrime(p)
 				count += 1
 			if count > 0:
-				result.append([p, count])
+				result.append([utilities.getPrime(p), count])
 			p += 1
-			while not all(p%d for d in primes): 
-				# We only need to check divisibility with other primes, not even number
-				p += 1
-			primes.append(p)
 		stack.append(result)
 	elif mode == 2 or mode == 3: # str or list
 		if len(z)==0:
@@ -742,18 +738,13 @@ def dLowDotOperator(stack, z, mode):
 		z = int(z)
 		if z < 4:
 			stack.append([z])
-		p = 2
+		p = 0
 		result = []
-		primes = [2] # The primes we know so far, just to make finding successive primes faster
 		while z > 1:
-			while z%p == 0:
-				result.append(p)
-				z //= p
+			while z%utilities.getPrime(p) == 0:
+				result.append(utilities.getPrime(p))
+				z //= utilities.getPrime(p)
 			p += 1
-			while not all(p%d for d in primes): 
-				# We only need to check divisibility with other primes, not even number
-				p += 1
-			primes.append(p)
 		stack.append(result)
 	elif mode == 2 or mode == 3: # str or list
 		def partitions(z):
@@ -793,7 +784,9 @@ def eHighDotOperator(stack, z, mode):
 def eLowDotOperator(stack, z, mode):
 	if mode == 1:   # num
 		stack.append(utilities.formatNum(math.acos(z)))
-	elif mode == 2 or mode == 3: # str or list
+	elif mode == 2:
+		""" Don't know what to do here yet """
+	elif mode == 3: # str or list
 		if len(z) == 0:
 			stack.append([])
 		else:
@@ -835,20 +828,6 @@ def fHighDotOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
-# ọ
-def oLowDotOperator(stack, z, mode):
-	if mode == 1:   # num
-		stack.append(-1 if z < 0 else (1 if z > 0 else 0))
-	elif mode == 2: # str
-		stack.append(z.strip())
-	elif mode == 3: # list
-		if len(z) <= 1:
-			stack.append(z)
-		else:
-			stack.append([z[i+1]-z[i] for i in range(len(z)-1)])
-	else:
-		monadNotImplemented(mode, '')
-
 # ḣ
 def hHighDotOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -874,37 +853,80 @@ def hLowDotOperator(stack, z, mode):
 # ṅ
 def nHighDotOperator(stack, z, mode):
 	if mode == 1:   # num
-		z = int(z)
-		primes = []
-		p = 1
-		while len(primes) < z:
-			while p == 1 or not all(p%d for d in primes):
-				p += 1
-			primes.append(p)
-		stack.append(primes)
+		if (z > 0):
+			stack.append(utilities.getPrimes(int(z)))
+		else:
+			stack.append([])
 	elif mode == 2: # str
 		stack.append()
 	elif mode == 3: # list
-		stack.append(1 if all(z) and len(z) > 0 else 0)
+		stack.append(1 if all(z) else 0)
 	else:
 		monadNotImplemented(mode, '')
 
 # ṇ
 def nLowDotOperator(stack, z, mode):
 	if mode == 1:   # num
-		z = int(z)
-		primes = []
-		p = 1
-		while len(primes) < z:
-			while p == 1 or not all(p%d for d in primes):
-				p += 1
-			primes.append(p)
-		if primes:
-			stack.append(primes[-1])
+		if (z > 0):
+			stack.append(utilities.getPrime(int(z)))
 	elif mode == 2: # str
 		stack.append()
 	elif mode == 3: # list
 		stack.append(1 if all(not i for i in z) else 0)
+	else:
+		monadNotImplemented(mode, '')
+
+# ȯ
+def oHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(abs(z))
+	elif mode == 2: # str
+		stack.append(''.join(sorted(z)))
+	elif mode == 3: # list
+		stack.append(sorted(z))
+	else:
+		monadNotImplemented(mode, '')
+
+# ọ
+def oLowDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(-1 if z < 0 else (1 if z > 0 else 0))
+	elif mode == 2: # str
+		stack.append(z.strip())
+	elif mode == 3: # list
+		if len(z) <= 1:
+			stack.append(z)
+		else:
+			stack.append([z[i+1]-z[i] for i in range(len(z)-1)])
+	else:
+		monadNotImplemented(mode, '')
+
+# ṗ
+def pHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		z = int(z)
+		if z < 2:
+			stack.append(0)
+		else:
+			while utilities.getPrime(-1) < z:
+				utilities.generatePrime()
+			stack.append(1 if z in utilities.getPrimes(-1) else 0)
+	elif mode == 2: # str
+		stack.append()
+	elif mode == 3: # list
+		stack.append()
+	else:
+		monadNotImplemented(mode, '')
+
+# ṙ
+def rHighDotOperator(stack, z, mode):
+	# TODO this isn't quite right because of the weird issue with the quote characters
+	if mode == 1:   # num
+		stack.append(str(z))
+	elif mode == 2: # str
+		stack.append('“'+re.sub('[\\\\“”‘’„‟]', '\\\\\g<0>', z)+'”') # TODO this should be used for the output format...
+	elif mode == 3: # list
+		stack.append(utilities.outputFormat(z))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1697,7 +1719,10 @@ ops = {
 	'ḥ': Operator('ḥ', 1, hLowDotOperator),
 	'ṅ': Operator('ṅ', 1, nHighDotOperator),
 	'ṇ': Operator('ṇ', 1, nLowDotOperator),
+	'ȯ': Operator('ȯ', 1, oHighDotOperator),
 	'ọ': Operator('ọ', 1, oLowDotOperator),
+	'ṗ': Operator('ṗ', 1, pHighDotOperator),
+	'ṙ': Operator('ṙ', 1, rHighDotOperator),
 	'ṡ': Operator('ṡ', 1, sHighDotOperator),
 	'ṣ': Operator('ṣ', 1, sLowDotOperator),
 	'ṫ': Operator('ṫ', 1, tHighDotOperator),

@@ -2,6 +2,8 @@ import sys
 import re
 import array
 
+import primes
+
 codepage = """₀₁₂₃₄₅₆₇₈₉ₓ₌ₔ∂€₵⟨⟩⟪⟫⇑⇓⇐⇒↑↓←→⇈⇊⇇⇉ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
 «»…┅⌋⌉⊂⊃∧∨ΣΠ‼×÷⁻øØ¤¶§ ₸ℍȦĊḊĖḞĠḢṀṄȮṖṘṠṪẆẊẎŻȧċḋėḟġḣṁṅȯṗṙṡṫẇẋẏżẠḄḌẸḤḲḶṂṆỌṚṢṬỤṾẈỴẒạḅḍẹḥḳḷṃṇọṛṣṭụṿẉỵẓ¿¡⁇⁈↻↺∞¦†‡∆∇⊢⊣‖           “”‘’„‟""" # TODO: finish code page
 
@@ -127,3 +129,21 @@ def castToList(v):
 	elif type(v) == list:
 		return v
 
+# Add a new prime to the prime list
+def generatePrime():
+	p = primes.primes[-1] + 1
+	while not all(p%n for n in primes.primes):
+		p += 1
+	primes.primes.append(p)
+
+# Get the nth prime
+def getPrime(n):
+	while len(primes.primes) < n:
+		generatePrime()
+	return primes.primes[n-1]
+
+# Get the first n primes
+def getPrimes(n):
+	while len(primes.primes) < n:
+		generatePrime()
+	return primes.primes[:n]
