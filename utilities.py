@@ -9,6 +9,7 @@ codepage = """₀₁₂₃₄₅₆₇₈₉ₓ₌ₔ∂€₵⟨⟩⟪⟫⇑⇓
 
 manualOutput = False
 inputs = []
+randoms = [0]
 
 def flatten(l):
 	result = []

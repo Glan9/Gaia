@@ -930,6 +930,18 @@ def rHighDotOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# ṛ
+def rLowDotOperator(stack, z, mode):
+	random.seed()
+	if mode == 1:   # num
+		stack.append(random.randint(1, int(z)))
+	elif mode == 2: # str
+		stack.append(random.choice(z))
+	elif mode == 3: # list
+		stack.append(random.choice(z))
+	else:
+		monadNotImplemented(mode, '')
+
 # ṡ
 def sHighDotOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -1723,6 +1735,7 @@ ops = {
 	'ọ': Operator('ọ', 1, oLowDotOperator),
 	'ṗ': Operator('ṗ', 1, pHighDotOperator),
 	'ṙ': Operator('ṙ', 1, rHighDotOperator),
+	'ṛ': Operator('ṛ', 1, rLowDotOperator),
 	'ṡ': Operator('ṡ', 1, sHighDotOperator),
 	'ṣ': Operator('ṣ', 1, sLowDotOperator),
 	'ṫ': Operator('ṫ', 1, tHighDotOperator),
