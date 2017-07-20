@@ -365,7 +365,7 @@ def leftParenthesisOperator(stack, z, mode):
 		stack.append(utilities.formatNum(z-1))
 	elif mode == 2: # str
 		if len(z) > 0:
-			stack.append(z[-1])
+			stack.append(z[0])
 	elif mode == 3: # list
 		if len(z) > 0:
 			stack.append(z[0])
@@ -531,6 +531,17 @@ def tOperator(stack, z, mode):
 		stack.append(newmatrix)
 	else:
 		monadNotImplemented(mode, 't')
+
+# u
+def uOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.formatNum(math.sqrt(z)))
+	elif mode == 2: # str
+		stack.append(''.join([z[i] for i in range(len(z)) if z[i] not in z[:i]]))
+	elif mode == 3: # list
+		stack.append([z[i] for i in range(len(z)) if z[i] not in z[:i]])
+	else:
+		monadNotImplemented(mode, '')
 
 # v
 def vOperator(stack, z, mode):
@@ -1709,6 +1720,7 @@ ops = {
 	'r': Operator('r', 1, rOperator),
 	's': Operator('s', 1, sOperator),
 	't': Operator('t', 1, tOperator),
+	'u': Operator('u', 1, uOperator),
 	'v': Operator('v', 1, vOperator),
 	'w': Operator('w', 1, wOperator),
 	'\\': Operator('\\', 1, backslashOperator),
