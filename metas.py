@@ -340,8 +340,13 @@ def cartesian(stack, ops, mode = None, x = None, y = None):
 		raise SyntaxError("† can't be combined with a nilad")
 
 	if ops[0].arity == 1:
-		# TODO Throw error for now because I don't know what this should do yet
-		raise SyntaxError("‡ can't be combined with a monad")
+		tempStack = [x]
+		ops[0].execute(tempStack)
+		tempStack = tempStack[::-1]
+		while tempStack:
+			stack.append(tempStack.pop())
+
+		stack.append(y)
 
 	if ops[0].arity == 2:
 		result = []

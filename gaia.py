@@ -71,12 +71,14 @@ def parseString(string, terminator):
 	i = 0
 	while i < len(string):
 		if string[i] == '\\':
-			if i < len(string)-1 and string[i+1] in '\\“”‘’„‟':
+			if i < len(string)-1 and string[i+1] in '\\“”‘’„‟¶':
 				string = string[:i]+string[i+1:]
 		elif string[i] == '“':
 			strings.append(string[:i])
 			string = string[i+1:]
 			i = 0
+		elif string[i] == '¶':
+			string = string[:i]+"\n"+string[i+1:]
 		i += 1
 	strings.append(string)
 
@@ -102,11 +104,11 @@ def parseString(string, terminator):
 
 		if len(newStrings) == 1:
 			if arity == 0:
-				return operators.Operator('“'+strings[0]+'„', 0, (lambda string: lambda stack: stack.append(runOperatorString(string)))(newStrings[0]))
+				return operators.Operator('“'+strings[0]+'„', 0, (lambda string: lambda stack: [stack.append(i) for i in runOperatorString(string)])(newStrings[0]))
 			elif arity == 1:
-				return operators.Operator('“'+strings[0]+'„', 1, (lambda string: lambda stack, z, mode: stack.append(runOperatorString(string, z)))(newStrings[0]))
+				return operators.Operator('“'+strings[0]+'„', 1, (lambda string: lambda stack, z, mode: [stack.append(i) for i in runOperatorString(string, z)])(newStrings[0]))
 			elif arity == 2:
-				return operators.Operator('“'+strings[0]+'„', 2, (lambda string: lambda stack, x, y, mode: stack.append(runOperatorString(string, x, y)))(newStrings[0]))
+				return operators.Operator('“'+strings[0]+'„', 2, (lambda string: lambda stack, x, y, mode: [stack.append(i) for i in runOperatorString(string, x, y)])(newStrings[0]))
 		else:
 			if arity == 0:
 				return operators.Operator('“'+strings[0]+'„', 0, (lambda strings: lambda stack: stack.append([runOperatorString(s) for s in strings]) )(newStrings))

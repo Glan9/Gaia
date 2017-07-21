@@ -404,6 +404,19 @@ def bOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# c
+def cOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(chr(int(z)))
+	elif mode == 2: # str
+		if z:
+			stack.append(ord(z[0]))
+	elif mode == 3: # list
+		z = [utilities.castToNumber(i) for i in z]
+		stack.append(utilities.fromBase(z, max(z)+1))
+	else:
+		monadNotImplemented(mode, '')
+
 # d
 def dOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -871,7 +884,7 @@ def nHighDotOperator(stack, z, mode):
 	elif mode == 2: # str
 		stack.append()
 	elif mode == 3: # list
-		stack.append(1 if all(z) else 0)
+		stack.append()
 	else:
 		monadNotImplemented(mode, '')
 
@@ -883,7 +896,7 @@ def nLowDotOperator(stack, z, mode):
 	elif mode == 2: # str
 		stack.append()
 	elif mode == 3: # list
-		stack.append(1 if all(not i for i in z) else 0)
+		stack.append()
 	else:
 		monadNotImplemented(mode, '')
 
@@ -992,10 +1005,19 @@ def tHighDotOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
-# ẏ
-def yHighDotOperator(stack, z, mode):
+# ṭ
+def tLowDotOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append()
+		stack.append(utilities.formatNum(math.atan(z)))
+	elif mode == 2 or mode == 3: # str or list
+		stack.append(1 if z[::-1]==z else 0)
+	else:
+		monadNotImplemented(mode, '')
+
+# ẋ
+def xHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(utilities.formatNum(1/z))
 	elif mode == 2: # str
 		result = []
 
@@ -1027,14 +1049,37 @@ def yHighDotOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
-# ż
-def zHighDotOperator(stack, z, mode):
+# ẏ
+def yHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(1 if z > 0 else 0)
+	elif mode == 2: # str
+		stack.append(1 if all(c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' for c in z) else 0)
+	elif mode == 3: # list
+		stack.append(1 if all(z) else 0)
+	else:
+		monadNotImplemented(mode, '')
+
+# ỵ
+def yLowDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append(1 if z < 0 else 0)
+	elif mode == 2: # str
+		stack.append(1 if all(c in 'abcdefghijklmnopqrstuvwxyz' for c in z) else 0)
+	elif mode == 3: # list
+		stack.append(1 if all(not i for i in z) else 0)
+	else:
+		monadNotImplemented(mode, '')
+
+# z
+def zOperator(stack, z, mode):
 	if mode == 1:   # num
 		stack.append(utilities.formatNum(2**z))
 	elif mode == 2: # str
 		stack.append()
 	elif mode == 3: # list
-		stack.append()
+		p=lambda s:[s[:1]+t for t in p(s[1:])]+p(s[1:])if s else [s]
+		stack.append(p(z))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1119,17 +1164,18 @@ def percentOperator(stack, x, y, mode):
 def ampersandOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(int(x) & int(y))
-	elif mode == 2: # num, str
-		stack.append()
-	elif mode == 3: # num, list
-		stack.append()
-	elif mode == 4: # str, num
-		stack.append()
+	elif mode == 2 or mode == 4 or mode == 3 or mode == 7: # num, str; str, num; num, list; lsit, num
+		(s,n) = (x,y) if mode == 4 or mode == 7 else (y,x)
+
+		result = "" if mode == 2 or mode == 4 else []
+
+		for i in s:
+			result += (i if mode == 2 or mode == 4 else [i])*abs(n)
+
+		stack.append(result[::-1 if n<0 else 1])
 	elif mode == 5: # str, str
 		stack.append()
 	elif mode == 6: # str, list
-		stack.append()
-	elif mode == 7: # list, num
 		stack.append()
 	elif mode == 8: # list, str
 		stack.append()
@@ -1199,7 +1245,11 @@ def plusOperator(stack, x, y, mode):
 		stack.append(x + str(y))
 	elif mode == 5: # str, str
 		stack.append(x + y)
+	elif mode == 6: # str, list
+		stack.append([x] + y)
 	elif mode == 7: # list, num
+		stack.append(x + [y])
+	elif mode == 8: # list, str
 		stack.append(x + [y])
 	elif mode == 9: # list, list
 		stack.append(x + y)
@@ -1709,6 +1759,7 @@ ops = {
 	')': Operator(')', 1, rightParenthesisOperator),
 	':': Operator(':', 1, colonOperator),
 	'b': Operator('b', 1, bOperator),
+	'c': Operator('c', 1, cOperator),
 	'd': Operator('d', 1, dOperator),
 	'e': Operator('e', 1, eOperator),
 	'f': Operator('f', 1, fOperator),
@@ -1723,6 +1774,7 @@ ops = {
 	'u': Operator('u', 1, uOperator),
 	'v': Operator('v', 1, vOperator),
 	'w': Operator('w', 1, wOperator),
+	'z': Operator('z', 1, zOperator),
 	'\\': Operator('\\', 1, backslashOperator),
 	'_': Operator('_', 1, underscoreOperator),
 	'~': Operator('~', 1, tildeOperator),
@@ -1751,8 +1803,10 @@ ops = {
 	'ṡ': Operator('ṡ', 1, sHighDotOperator),
 	'ṣ': Operator('ṣ', 1, sLowDotOperator),
 	'ṫ': Operator('ṫ', 1, tHighDotOperator),
+	'ṭ': Operator('ṭ', 1, tLowDotOperator),
+	'ẋ': Operator('ẋ', 1, xHighDotOperator),
 	'ẏ': Operator('ẏ', 1, yHighDotOperator),
-	'ż': Operator('ż', 1, zHighDotOperator),
+	'ỵ': Operator('ỵ', 1, yLowDotOperator),
 	'€|': Operator('€|', 1, extPipeOperator),
 	'€[': Operator('€[', 1, extLeftBracketOperator),
 	'€]': Operator('€]', 1, extRightBracketOperator),
