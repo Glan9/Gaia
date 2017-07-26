@@ -131,29 +131,45 @@ def sectionOperator(stack):
 def atOperator(stack):
 	stack.append(utilities.getInput())
 
-# ₵L
-def constLOperator(stack):
+# ₵a
+def constaOperator(stack):
 	stack.append('abcdefghijklmnopqrstuvwxyz')
 
-# ₵U
-def constUOperator(stack):
+# ₵A
+def constAOperator(stack):
 	stack.append('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+
+# ₵v
+def constvOperator(stack):
+	stack.append('aeiou')
 
 # ₵V
 def constVOperator(stack):
-	stack.append('aeiou')
+	stack.append('AEIOU')
+
+# ₵x
+def constxOperator(stack):
+	stack.append('bcdfghjklmnpqrstvwxz')
 
 # ₵X
 def constXOperator(stack):
-	stack.append('bcdfghjklmnpqrstvwxz')
+	stack.append('BCDFGHJKLMNPQRSTVWXZ')
+
+# ₵c
+def constcOperator(stack):
+	stack.append('bcdfghjklmnpqrstvwxyz')
 
 # ₵C
 def constCOperator(stack):
-	stack.append('bcdfghjklmnpqrstvwxyz')
+	stack.append('BCDFGHJKLMNPQRSTVWXYZ')
+
+# ₵y
+def constyOperator(stack):
+	stack.append('aeiouy')
 
 # ₵Y
 def constYOperator(stack):
-	stack.append('aeiouy')
+	stack.append('AEIOUY')
 
 # ₵D
 def constDOperator(stack):
@@ -163,9 +179,17 @@ def constDOperator(stack):
 def constHOperator(stack):
 	stack.append('0123456789ABCDEF')
 
+# ₵h
+def consthOperator(stack):
+	stack.append('0123456789abcdef')
+
+# ₵q
+def constqOperator(stack):
+	stack.append(['qwertyuiop', 'asdfghjkl', 'zxcvbnm'])
+
 # ₵Q
 def constQOperator(stack):
-	stack.append(['qwertyuiop', 'asdfghjkl', 'zxcvbnm'])
+	stack.append(['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'])
 
 # ₸
 def struckTOperator(stack):
@@ -1406,16 +1430,12 @@ def caretOperator(stack, x, y, mode):
 def pipeOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(int(x) | int(y))
-	elif mode == 2: # num, str
-		stack.append([y[:int(x)], y[int(x):]])
-	elif mode == 3: # num, list
-		stack.append([y[:int(x)], y[int(x):]])
-	elif mode == 4: # str, num
-		stack.append([x[:int(y)], x[int(y):]])
+	#elif mode == 2: # num, str
+	#elif mode == 3: # num, list
+	#elif mode == 4: # str, num
 	#elif mode == 5: # str, str
 	#elif mode == 6: # str, list
-	elif mode == 7: # list, num
-		stack.append([x[:int(y)], x[int(y):]])
+	#elif mode == 7: # list, num
 	#elif mode == 8: # list, str
 	elif mode == 9: # list, list
 		result = []
@@ -1587,6 +1607,53 @@ def minusOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
+# B
+def BOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(utilities.toBase(int(x), int(y)))
+	elif mode == 2: # num, str
+		stack.append(''.join(y[i] for i in utilities.toBase(int(x), len(y))))
+	elif mode == 3: # num, list
+		stack.append()
+	elif mode == 4: # str, num
+		stack.append(''.join(x[i] for i in utilities.toBase(int(y), len(x))))
+	elif mode == 5: # str, str
+		digitList = [0 if y.find(c)==-1 else y.find(c) for c in x]
+		stack.append(utilities.fromBase(digitList, len(y)))
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		stack.append()
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		stack.append()
+	else:
+		dyadNotImplemented(mode, '')
+
+# C
+def COperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(-1 if x<y else (1 if x > y else 0))
+	elif mode == 2: # num, str
+		stack.append()
+	elif mode == 3: # num, list
+		stack.append(y.count(x))
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append(x.count(y))
+	elif mode == 6: # str, list
+		stack.append(y.count(x))
+	elif mode == 7: # list, num
+		stack.append(x.count(y))
+	elif mode == 8: # list, str
+		stack.append(x.count(y))
+	elif mode == 9: # list, list
+		stack.append() # TODO
+	else:
+		dyadNotImplemented(mode, '')
+
 # Ė
 def EHighDotOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
@@ -1604,6 +1671,41 @@ def EHighDotOperator(stack, x, y, mode):
 		stack.append(1 if y in x else 0)
 	elif mode == 9: # list, list
 		stack.append(1 if x in y else 0)
+	else:
+		dyadNotImplemented(mode, '')
+
+# S
+def SOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		x = int(x)
+		y = int(y)
+		if y < 0 or y > x:
+			stack.append(0)
+		else:
+			stack.append(math.factorial(x)/(math.factorial(y)*math.factorial(x-y)))
+	elif mode == 2 or mode == 3: # num, str; num, list
+		stack.append([y[:int(x)], y[int(x):]])
+	elif mode == 4 or mode == 7: # str, num; list, num
+		stack.append([x[:int(y)], x[int(y):]])
+	elif mode == 6 or mode == 8: # str, list; list, str
+		l = x if mode == 8 else y
+		s = y if mode == 8 else x
+
+		if s in l:
+			index = l.index(s)
+			stack.append([l[:index], l[index+1:]])
+		else:
+			stack.append(l)
+	#elif mode == 4: # str, num
+	elif mode == 5: # str, str
+		s = x.split(y)
+		stack.append([s[0], y.join(s[1:])])
+	elif mode == 9: # list, list
+		for i in range(len(x)):
+			if x[i:i+len(y)] == y:
+				stack.append([x[:i], x[i+len(y):]])
+				return
+		stack.append(x)
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -1673,16 +1775,23 @@ Each value should be an Operator object
 
 ops = {
 	# Nilads
+	'₵A': Operator('₵A', 0, constAOperator),
+	'₵a': Operator('₵a', 0, constaOperator),
 	'₵C': Operator('₵C', 0, constCOperator),
+	'₵c': Operator('₵c', 0, constcOperator),
 	'₵D': Operator('₵D', 0, constDOperator),
 	'₵E': Operator('₵E', 0, constEOperator),
-	'₵L': Operator('₵L', 0, constLOperator),
+	'₵H': Operator('₵H', 0, constHOperator),
+	'₵h': Operator('₵h', 0, consthOperator),
 	'₵P': Operator('₵P', 0, constPOperator),
 	'₵Q': Operator('₵Q', 0, constQOperator),
-	'₵U': Operator('₵U', 0, constUOperator),
+	'₵q': Operator('₵q', 0, constqOperator),
 	'₵V': Operator('₵V', 0, constVOperator),
+	'₵v': Operator('₵v', 0, constvOperator),
 	'₵X': Operator('₵X', 0, constXOperator),
+	'₵x': Operator('₵x', 0, constxOperator),
 	'₵Y': Operator('₵Y', 0, constYOperator),
+	'₵y': Operator('₵y', 0, constyOperator),
 	'∂A': Operator('∂A', 0, dateAOperator),
 	'∂a': Operator('∂a', 0, dateaOperator),
 	'∂D': Operator('∂D', 0, dateDOperator),
@@ -1793,7 +1902,6 @@ ops = {
 	'<': Operator('<', 2, lessThanOperator),
 	'=': Operator('=', 2, equalsOperator),
 	'>': Operator('>', 2, greaterThanOperator),
-	'Z': Operator('Z', 2, ZOperator),
 	'^': Operator('^', 2, caretOperator),
 	'|': Operator('|', 2, pipeOperator),
 	'⊂': Operator('⊂', 2, subsetOperator),
@@ -1804,7 +1912,11 @@ ops = {
 	'×': Operator('×', 2, timesOperator),
 	'÷': Operator('÷', 2, divisionOperator),
 	'¤': Operator('¤', 2, currencyOperator),
-	'Ė': Operator('Ė', 2, EHighDotOperator)
+	'B': Operator('B', 2, BOperator),
+	'C': Operator('C', 2, COperator),
+	'Ė': Operator('Ė', 2, EHighDotOperator),
+	'S': Operator('S', 2, SOperator),
+	'Z': Operator('Z', 2, ZOperator)
 
 
 }
