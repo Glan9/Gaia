@@ -328,7 +328,7 @@ def runOperatorString(string, x = None, y = None):
 		if y != None:
 			tempStack.append(y)
 		op.execute(tempStack)
-
+		
 	return tempStack
 
 ###########################
