@@ -733,6 +733,17 @@ def doubleExclamationOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# ċ
+def cHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		stack.append([0]*abs(int(z)))
+	elif mode == 2: # str
+		stack.append([ord(i) for i in z])
+	elif mode == 3: # list
+		stack.append(range(1,len(z)+1))
+	else:
+		monadNotImplemented(mode, '')
+
 # ḋ
 def dHighDotOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -1952,6 +1963,7 @@ ops = {
 	'⌋': Operator('⌋', 1, floorOperator),
 	'⌉': Operator('⌉', 1, ceilOperator),
 	'Σ': Operator('Σ', 1, sigmaOperator),
+	'ċ': Operator('ċ', 1, cHighDotOperator),
 	'ḋ': Operator('ḋ', 1, dHighDotOperator),
 	'ḍ': Operator('ḍ', 1, dLowDotOperator),
 	'ė': Operator('ė', 1, eHighDotOperator),
