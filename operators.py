@@ -443,16 +443,7 @@ def dOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
-# e
-def eOperator(stack, z, mode):
-	if mode == 1:   # num
-		stack.append(utilities.formatNum(10**z))
-	#elif mode == 2: # str
-		# Not sure how eval will work yet
-	elif mode == 3: # list
-		[stack.append(i) for i in z]
-	else:
-		monadNotImplemented(mode, 'e')
+# e is defined in gaia.py
 
 # f
 def fOperator(stack, z, mode):
@@ -1937,7 +1928,6 @@ ops = {
 	'b': Operator('b', 1, bOperator),
 	'c': Operator('c', 1, cOperator),
 	'd': Operator('d', 1, dOperator),
-	'e': Operator('e', 1, eOperator),
 	'f': Operator('f', 1, fOperator),
 	'h': Operator('h', 1, hOperator),
 	'i': Operator('i', 1, iOperator),
