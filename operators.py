@@ -1178,8 +1178,7 @@ def percentOperator(stack, x, y, mode):
 	elif mode == 7: # list, num
 		stack.append(x[::int(y)])
 	#elif mode == 8: # list, str
-	elif mode == 9: # list, list
-		stack.append([i for i in x if i in y])
+	#elif mode == 9: # list, list
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -1228,7 +1227,8 @@ def asteriskOperator(stack, x, y, mode):
 
 		stack.append(result)
 	#elif mode == 4: # str, num
-	#elif mode == 5: # str, str
+	elif mode == 5: # str, str
+		stack.append(''.join(i for i in x if i in y))
 	#elif mode == 6: # str, list
 	elif mode == 7: # list, num
 		if y == 0:
@@ -1244,7 +1244,8 @@ def asteriskOperator(stack, x, y, mode):
 
 		stack.append(result)
 	#elif mode == 8: # list, str
-	#elif mode == 9: # list, list
+	elif mode == 9: # list, list
+		stack.append([i for i in x if i in y])
 	else:
 		dyadNotImplemented(mode, '')
 
