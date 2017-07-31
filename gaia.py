@@ -137,7 +137,7 @@ def interpret(code):
 
 		# Make it a list only if there's more than 1
 		if len(strings) == 1:
-			return operators.Operator('“'+strings[0]+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
+			return operators.Operator('“'+string+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings[0]) )
 		else:
 			return operators.Operator('“'+string+'”', 0, ( lambda x: lambda stack: stack.append(x) )(strings) )
 
@@ -213,31 +213,31 @@ def interpret(code):
 				if line[0] == '⇑':
 					# The +[1] on each is to make sure the list is not empty, and therefore will always evaluate the right side of the 'and'. This is hacky, but the entire thing is hacky...
 					# Call function above on whole stack
-					func.append(operators.Operator( '⇑', 0, lambda stack: callStack.append((callStack[-1]-1)%len(functions)) or runFunction(stack, functions[callStack[-1]])+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇑', 0, lambda stack: callStack.append((callStack[-1]-1)%len(functions)) or runFunction(stack, functions[callStack[-1]], arrayMarkers)+[1] and callStack.pop() ))
 				elif line[0] == '↑':
 					# Call function above as a monad
-					func.append(operators.Operator( '↑', 1, lambda stack, z, mode: callStack.append((callStack[-1]-1)%len(functions)) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '↑', 1, lambda stack, z, mode: callStack.append((callStack[-1]-1)%len(functions)) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
 				elif line[0] == '⇈':
 					# Call function above as a dyad
-					func.append(operators.Operator( '⇈', 2, lambda stack, x, y, mode: callStack.append((callStack[-1]-1)%len(functions)) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇈', 2, lambda stack, x, y, mode: callStack.append((callStack[-1]-1)%len(functions)) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
 				elif line[0] == '⇓':
 					# Call function below on whole stack
-					func.append(operators.Operator( '⇓', 0, lambda stack: callStack.append((callStack[-1]+1)%len(functions)) or runFunction(stack, functions[callStack[-1]])+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇓', 0, lambda stack: callStack.append((callStack[-1]+1)%len(functions)) or runFunction(stack, functions[callStack[-1]], arrayMarkers)+[1] and callStack.pop() ))
 				elif line[0] == '↓':
 					# Call function below as a monad
-					func.append(operators.Operator( '↓', 1, lambda stack, z, mode: callStack.append((callStack[-1]+1)%len(functions)) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '↓', 1, lambda stack, z, mode: callStack.append((callStack[-1]+1)%len(functions)) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
 				elif line[0] == '⇊':
 					# Call function below as a dyad
-					func.append(operators.Operator( '⇊', 2, lambda stack, x, y, mode: callStack.append((callStack[-1]+1)%len(functions)) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇊', 2, lambda stack, x, y, mode: callStack.append((callStack[-1]+1)%len(functions)) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
 				elif line[0] == '⇐':
 					# Call current function on whole stack
-					func.append(operators.Operator( '⇐', 0, lambda stack: callStack.append(callStack[-1]) or runFunction(stack, functions[callStack[-1]])+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇐', 0, lambda stack: callStack.append(callStack[-1]) or runFunction(stack, functions[callStack[-1]], arrayMarkers)+[1] and callStack.pop() ))
 				elif line[0] == '←':
 					# Call current function as a monad
-					func.append(operators.Operator( '←', 1, lambda stack, z, mode: callStack.append(callStack[-1]) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '←', 1, lambda stack, z, mode: callStack.append(callStack[-1]) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
 				elif line[0] == '⇇':
 					# Call current function as a dyad
-					func.append(operators.Operator( '⇇', 2, lambda stack, x, y, mode: callStack.append(callStack[-1]) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇇', 2, lambda stack, x, y, mode: callStack.append(callStack[-1]) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
 				line = line[1:]
 			elif line[0] == '[':
 				# Match the opening of an array

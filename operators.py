@@ -1035,7 +1035,7 @@ def uLowDotOperator(stack, z, mode):
 	elif mode == 2: # str
 		stack.append([s.split() for s in z.split('\n')])
 	elif mode == 3: # list
-		stack.append([[i+1, z[i]] for i in range(len(z))])
+		stack.append('\n'.join(' '.join(utilities.castToString(w) for w in s) for s in z))
 	else:
 		monadNotImplemented(mode, '')
 

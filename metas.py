@@ -372,7 +372,7 @@ def whileLoop(stack, ops, mode = None, x = None, y = None):
 	while True:
 		ops[0].execute(stack)
 
-		if stack.pop():
+		if stack[-1]:
 			ops[1].execute(stack)
 		else:
 			break
@@ -383,7 +383,7 @@ def untilLoop(stack, ops, mode = None, x = None, y = None):
 	while True:
 		ops[0].execute(stack)
 
-		if not stack.pop():
+		if not stack[-1]:
 			ops[1].execute(stack)
 		else:
 			break
@@ -440,6 +440,7 @@ def findIndex(stack, ops, mode = None, x = None, y = None):
 			if tempStack.pop():
 				stack.append(i+1)
 				return
+		stack.append(0)
 
 	elif ops[0].arity == 2:
 
@@ -451,6 +452,7 @@ def findIndex(stack, ops, mode = None, x = None, y = None):
 				if tempStack.pop():
 					stack.append(i+1)
 					return
+			stack.append(0)
 		elif mode == 3 or mode == 6:
 			# if y is a list
 			for i in range(len(y)):
@@ -459,6 +461,7 @@ def findIndex(stack, ops, mode = None, x = None, y = None):
 				if tempStack.pop():
 					stack.append(i+1)
 					return
+			stack.append(0)
 		else:
 			# if neither is a list
 			x = utilities.castToList(x)
@@ -468,6 +471,7 @@ def findIndex(stack, ops, mode = None, x = None, y = None):
 				if tempStack.pop():
 					stack.append(i+1)
 					return
+			stack.append(0)
 
 # ∇
 def findElement(stack, ops, mode = None, x = None, y = None):
