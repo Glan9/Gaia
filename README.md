@@ -2,16 +2,10 @@
 
 A work-in-progress golfing language inspired by [CJam](https://sourceforge.net/projects/cjam/), [Jelly](https://github.com/DennisMitchell/jelly), [Ohm](https://github.com/nickbclifford/Ohm), and [SOGL](https://github.com/dzaima/SOGL).
 
-Gaia is still incomplete. Currently the parser is mostly complete, so it's usable but still has a limited set of operators and built-in functions.
+## Running Gaia
 
-Documentation is currently unavailable. I will begin to write up proper docs when the language is more complete.
+To run Gaia, simply download all files, then run `python gaia.py <filename>`. Additionally, you can run it with the `-e` flag, which runs a program encoded using Gaia's codepage.
 
-## Basic Syntax
+## Documentation
 
-Gaia is stack-based, so all operators and functions are written in postfix notation. There are three data types in Gaia: number, string, list. All operators do something different for each data type. For example, the operator `$`
-
- - converts a number to a list of digits;
- - converts a string to a list of characters; or
- - joins a list into a string, with no separator.
- 
-Not every operator supports all types or combinations of types.
+Some documentation is available on the [wiki](https://github.com/splcurran/Gaia/wiki); however, the documentation is still mostly incomplete.
