@@ -572,9 +572,9 @@ def sOperator(stack, z, mode):
 	if mode == 1:   # num
 		stack.append(utilities.formatNum(z*z))
 	elif mode == 2: # str
-		stack.append('\n'.join(z for i in z))
+		stack.append([[i, z[i-1]] for i in range(1,len(z)+1)])
 	elif mode == 3: # list
-		stack.append([z for i in z])
+		stack.append([[i, z[i-1]] for i in range(1,len(z)+1)])
 	else:
 		monadNotImplemented(mode, '')
 
