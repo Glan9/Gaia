@@ -1520,7 +1520,16 @@ def ZOperator(stack, x, y, mode):
 				index += y
 			result.append(''.join(step))
 		stack.append(result)
-	#elif mode == 5: # str, str
+	elif mode == 5 or mode == 9: # str, str; list, list
+		result = []
+		minlen = min(len(x), len(y))
+		for i in range(minlen):
+			result.append(x[i])
+			result.append(y[i])
+		result += x[minlen:] + y[minlen:]
+		if mode == 5:
+			result = ''.join(result)
+		stack.append(result)
 	#elif mode == 6: # str, list
 	elif mode == 7: # list, num
 		result = []
@@ -1536,7 +1545,6 @@ def ZOperator(stack, x, y, mode):
 			result.append(step)
 		stack.append(result)
 	#elif mode == 8: # list, str
-	#elif mode == 9: # list, list
 	else:
 		dyadNotImplemented(mode, '')
 
