@@ -456,6 +456,30 @@ def fOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# g
+def gOperator(stack, z, mode):
+	if mode == 1:   # num
+		1#stack.append()
+	elif mode == 2: # str
+		args = sys.argv
+		args = args[1:]
+		if len(args) > 0:
+			if re.match('^-', args[0]):
+				# If the next arg starts with - it has flags
+				flags = list(args[0][1:])
+				args = args[1:]
+
+		filepath = args[0]
+		filepath = re.sub('/[^/]*$','/',filepath)
+		z = filepath+(z or re.sub('(.*/)?', '', args[0]))
+		
+		stack.append(open(z, 'r', encoding='utf-8').read())
+	elif mode == 3: # list
+		gradeup = lambda l:[x[1]+1 for x in sorted([[l[i], i] for i in range(len(l))])]
+		stack.append(gradeup(z))
+	else:
+		monadNotImplemented(mode, '')
+
 # h
 def hOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -482,6 +506,32 @@ def lOperator(stack, z, mode):
 		stack.append(len(z))
 	elif mode == 3: # list
 		stack.append(len(z))
+	else:
+		monadNotImplemented(mode, '')
+
+# n
+def nOperator(stack, z, mode):
+	#if mode == 1:   # num
+	#elif mode == 2: # str
+	if mode == 3: # list
+		def depth(l):
+			if type(l) != list:
+				return 0
+			d = 1
+			for i in l:
+				if type(l) == list:
+					d = max(d, 1+depth(i))
+			return d
+		stack.append(depth(z))
+	else:
+		monadNotImplemented(mode, '')
+
+# o
+def oOperator(stack, z, mode):
+	if mode == 2: # str
+		stack.append(1 if sorted(z) in [z, z[::-1]] else 0)
+	elif mode == 3: # list
+		stack.append(1 if sorted(z) in [z, z[::-1]] else 0)
 	else:
 		monadNotImplemented(mode, '')
 
@@ -676,7 +726,7 @@ def floorOperator(stack, z, mode):
 	elif mode == 2: # str
 		stack.append(z.lower())
 	elif mode == 3: # list
-		z = [utilities.castToNumber(i) for i in z]
+		#z = [utilities.castToNumber(i) for i in z]
 		stack.append(min(z))
 	else:
 		monadNotImplemented(mode, '')
@@ -688,7 +738,7 @@ def ceilOperator(stack, z, mode):
 	elif mode == 2: # str
 		stack.append(z.upper())
 	elif mode == 3: # list
-		z = [utilities.castToNumber(i) for i in z]
+		#z = [utilities.castToNumber(i) for i in z]
 		stack.append(max(z))
 	else:
 		monadNotImplemented(mode, '')
@@ -881,6 +931,30 @@ def hLowDotOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
+# ṁ
+def mHighDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		z = int(z)
+		stack.append(stack.pop(len(stack)-((z-1)%len(stack))-1))
+	#elif mode == 2: # str
+	elif mode == 3: # list
+		m = max(z)
+		stack.append([i for i in z if i==m])
+	else:
+		monadNotImplemented(mode, '')
+
+# ṃ
+def mLowDotOperator(stack, z, mode):
+	if mode == 1:   # num
+		z = int(z)
+		stack.append(stack[len(stack)-((z-1)%len(stack))-1])
+	#elif mode == 2: # str
+	elif mode == 3: # list
+		m = min(z)
+		stack.append([i for i in z if i==m])
+	else:
+		monadNotImplemented(mode, '')
+
 # ṅ
 def nHighDotOperator(stack, z, mode):
 	if mode == 1:   # num
@@ -888,8 +962,7 @@ def nHighDotOperator(stack, z, mode):
 			stack.append(utilities.getPrimes(int(z)))
 		else:
 			stack.append([])
-	elif mode == 2: # str
-		stack.append()
+	#elif mode == 2: # str
 	elif mode == 3: # list
 		if len(z) > 0:
 			stack.append(z[1:])
@@ -902,8 +975,7 @@ def nLowDotOperator(stack, z, mode):
 	if mode == 1:   # num
 		if (z > 0):
 			stack.append(utilities.getPrime(int(z)))
-	elif mode == 2: # str
-		stack.append()
+	#elif mode == 2: # str
 	elif mode == 3: # list
 		if len(z) > 0:
 			stack.append(z[:-1])
@@ -946,10 +1018,8 @@ def pHighDotOperator(stack, z, mode):
 			while utilities.getPrime(-1) < z:
 				utilities.generatePrime()
 			stack.append(1 if z in utilities.getPrimes(-1) else 0)
-	elif mode == 2: # str
-		stack.append()
-	elif mode == 3: # list
-		stack.append()
+	#elif mode == 2: # str
+	#elif mode == 3: # list
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1100,8 +1170,7 @@ def yLowDotOperator(stack, z, mode):
 def zOperator(stack, z, mode):
 	if mode == 1:   # num
 		stack.append(utilities.formatNum(2**z))
-	elif mode == 2: # str
-		stack.append()
+	#elif mode == 2: # str
 	elif mode == 3: # list
 		p=lambda s:[s[:1]+t for t in p(s[1:])]+p(s[1:])if s else [s]
 		stack.append(p(z))
@@ -1113,9 +1182,8 @@ def zOperator(stack, z, mode):
 # €[
 def extLeftBracketOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append()
-	elif mode == 2: # str
-		stack.append()
+		1#stack.append()
+	#elif mode == 2: # str
 	elif mode == 3: # list
 		z = [re.sub("^\s*([\s\S]*?)\s*$", "\g<1>", utilities.castToString(i)) for i in z]
 		maxLength = max(len(i) for i in z)
@@ -1128,9 +1196,8 @@ def extLeftBracketOperator(stack, z, mode):
 # €|
 def extPipeOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append()
-	elif mode == 2: # str
-		stack.append()
+		1#stack.append()
+	#elif mode == 2: # str
 	elif mode == 3: # list
 		z = [re.sub("^\s*([\s\S]*?)\s*$", "\g<1>", utilities.castToString(i)) for i in z]
 		maxLength = max(len(i) for i in z)
@@ -1143,9 +1210,8 @@ def extPipeOperator(stack, z, mode):
 # €]
 def extRightBracketOperator(stack, z, mode):
 	if mode == 1:   # num
-		stack.append()
-	elif mode == 2: # str
-		stack.append()
+		1#stack.append()
+	#elif mode == 2: # str
 	elif mode == 3: # list
 		z = [re.sub("^\s*([\s\S]*?)\s*$", "\g<1>", utilities.castToString(i)) for i in z]
 		maxLength = max(len(i) for i in z)
@@ -1211,8 +1277,7 @@ def ampersandOperator(stack, x, y, mode):
 def asteriskOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(utilities.formatNum(x ** y))
-	elif mode == 2: # num, str
-		stack.append()
+	#elif mode == 2: # num, str
 	elif mode == 3: # num, list
 		if x == 0:
 			stack.append([])
@@ -1727,12 +1792,10 @@ def BOperator(stack, x, y, mode):
 def COperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(-1 if x<y else (1 if x > y else 0))
-	elif mode == 2: # num, str
-		stack.append()
+	#elif mode == 2: # num, str
 	elif mode == 3: # num, list
 		stack.append(y.count(x))
-	elif mode == 4: # str, num
-		stack.append()
+	#elif mode == 4: # str, num
 	elif mode == 5: # str, str
 		stack.append(x.count(y))
 	elif mode == 6: # str, list
@@ -1741,8 +1804,7 @@ def COperator(stack, x, y, mode):
 		stack.append(x.count(y))
 	elif mode == 8: # list, str
 		stack.append(x.count(y))
-	elif mode == 9: # list, list
-		stack.append() # TODO
+	#elif mode == 9: # list, list
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -1930,9 +1992,12 @@ ops = {
 	'c': Operator('c', 1, cOperator),
 	'd': Operator('d', 1, dOperator),
 	'f': Operator('f', 1, fOperator),
+	'g': Operator('g', 1, gOperator),
 	'h': Operator('h', 1, hOperator),
 	'i': Operator('i', 1, iOperator),
 	'l': Operator('l', 1, lOperator),
+	'n': Operator('n', 1, nOperator),
+	'o': Operator('o', 1, oOperator),
 	'p': Operator('p', 1, pOperator),
 	'q': Operator('q', 1, qOperator),
 	'r': Operator('r', 1, rOperator),
@@ -1962,6 +2027,8 @@ ops = {
 	'ḟ': Operator('ḟ', 1, fHighDotOperator),
 	'ḣ': Operator('ḣ', 1, hHighDotOperator),
 	'ḥ': Operator('ḥ', 1, hLowDotOperator),
+	'ṁ': Operator('ṁ', 1, mHighDotOperator),
+	'ṃ': Operator('ṃ', 1, mLowDotOperator),
 	'ṅ': Operator('ṅ', 1, nHighDotOperator),
 	'ṇ': Operator('ṇ', 1, nLowDotOperator),
 	'ȯ': Operator('ȯ', 1, oHighDotOperator),

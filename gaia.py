@@ -9,6 +9,7 @@ import operators
 import metas
 import utilities
 
+sourcecode = ''
 stack = []
 
 def interpret(code):
@@ -364,6 +365,7 @@ def eOperator(stack, z, mode):
 
 operators.ops['e'] = operators.Operator('e', 1, eOperator)
 
+sourcecode = code
 interpret(code)
 
 if len(stack) > 0 and utilities.manualOutput == False:
