@@ -27,7 +27,7 @@ def toBase(num, base):
 	num = abs(num)
 
 	if num == 0:
-		return []
+		return [0]
 	if base == 0:
 		return [num]
 	if base == 1:

@@ -191,6 +191,18 @@ def constqOperator(stack):
 def constQOperator(stack):
 	stack.append(['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'])
 
+# ₵R
+def constROperator(stack):
+	stack.append(""" !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~""")
+
+# ₵r
+def constrOperator(stack):
+	stack.append(utilities.codepage)
+
+# ₵W
+def constWOperator(stack):
+	stack.append("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
+
 # ₸
 def struckTOperator(stack):
 	stack.append(10)
@@ -781,7 +793,7 @@ def cHighDotOperator(stack, z, mode):
 	elif mode == 2: # str
 		stack.append([ord(i) for i in z])
 	elif mode == 3: # list
-		stack.append(range(1,len(z)+1))
+		stack.append(list(range(1,len(z)+1)))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1125,7 +1137,7 @@ def xHighDotOperator(stack, z, mode):
 				currentRun = z[i]
 				result.append(z[start:i])
 				start = i
-
+		result.append(z[start:])
 		stack.append(result)
 	elif mode == 3: # list
 		result = []
@@ -1139,7 +1151,7 @@ def xHighDotOperator(stack, z, mode):
 				currentRun = z[i]
 				result.append(z[start:i])
 				start = i
-
+		result.append(z[start:])
 		stack.append(result)
 	else:
 		monadNotImplemented(mode, '')
@@ -1476,78 +1488,6 @@ def greaterThanOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
-# Z
-def ZOperator(stack, x, y, mode):
-	if mode == 1:   # num, num
-		stack.append(utilities.formatNum(x // y))
-		stack.append(utilities.formatNum(x % y))
-	elif mode == 2: # num, str
-		result = []
-		x = int(x)
-		if x < 1 or x > len(y):
-			raise ValueError("invalid size for unzipping: "+str(x))
-		for i in range(x):
-			index = i
-			step = []
-			while index < len(y):
-				step.append(y[index])
-				index += x
-			result.append(''.join(step))
-		stack.append(result)
-	elif mode == 3: # num, list
-		result = []
-		x = int(x)
-		if x < 1 or x > len(y):
-			raise ValueError("invalid size for unzipping: "+str(x))
-		for i in range(x):
-			index = i
-			step = []
-			while index < len(y):
-				step.append(y[index])
-				index += x
-			result.append(step)
-		stack.append(result)
-	elif mode == 4: # str, num
-		result = []
-		y = int(y)
-		if y < 1 or y > len(x):
-			raise ValueError("invalid size for unzipping "+str(y))
-		for i in range(y):
-			index = i
-			step = []
-			while index < len(x):
-				step.append(x[index])
-				index += y
-			result.append(''.join(step))
-		stack.append(result)
-	elif mode == 5 or mode == 9: # str, str; list, list
-		result = []
-		minlen = min(len(x), len(y))
-		for i in range(minlen):
-			result.append(x[i])
-			result.append(y[i])
-		result += x[minlen:] + y[minlen:]
-		if mode == 5:
-			result = ''.join(result)
-		stack.append(result)
-	#elif mode == 6: # str, list
-	elif mode == 7: # list, num
-		result = []
-		y = int(y)
-		if y < 1 or y > len(x):
-			raise ValueError("invalid size for unzipping "+str(y))
-		for i in range(y):
-			index = i
-			step = []
-			while index < len(x):
-				step.append(x[index])
-				index += y
-			result.append(step)
-		stack.append(result)
-	#elif mode == 8: # list, str
-	else:
-		dyadNotImplemented(mode, '')
-
 # ^
 def caretOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
@@ -1819,7 +1759,7 @@ def COperator(stack, x, y, mode):
 # Ė
 def EHighDotOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		stack.append(1 if x % y == 0 else 0)
+		stack.append(1 if (x==0 and y==0) or (x % y == 0) else 0)
 	#elif mode == 2: # num, str
 	elif mode == 3: # num, list
 		stack.append(1 if x in y else 0)
@@ -1833,6 +1773,78 @@ def EHighDotOperator(stack, x, y, mode):
 		stack.append(1 if y in x else 0)
 	elif mode == 9: # list, list
 		stack.append(1 if x in y else 0)
+	else:
+		dyadNotImplemented(mode, '')
+
+# I
+def IOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(round(x, y))
+	elif mode == 2: # num, str
+		stack.append()
+	elif mode == 3: # num, list
+		stack.append(y.index(x) if x in y else 0)
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append(x.find(y)+1)
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 7: # list, num
+		stack.append(x.index(y) if y in x else 0)
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		if len(y)>len(x):
+			stack.append(0)
+		else:
+			for i in range(len(x)):
+				if x[i:i+len(y)]==y:
+					stack.append(i+1)
+					return
+			stack.append(0)
+	else:
+		dyadNotImplemented(mode, '')
+
+# Ṁ
+def MHighDotOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(max(x,y))
+	elif mode == 2: # num, str
+		stack.append()
+	#elif mode == 3 or mode == 7: # num, list; list, num
+		# Not sure how to implement this yet
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append(max(x,y))
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		stack.append(max(x,y))
+	else:
+		dyadNotImplemented(mode, '')
+
+# Ṃ
+def MLowDotOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(min(x,y))
+	elif mode == 2: # num, str
+		stack.append()
+	#elif mode == 3 or mode == 7: # num, list; list, num
+		# Not sure how to implement this yet
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append(min(x,y))
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		stack.append(min(x,y))
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -1863,6 +1875,78 @@ def SOperator(stack, x, y, mode):
 				stack.append([x[:i], x[i+len(y):]])
 				return
 		stack.append(x)
+	else:
+		dyadNotImplemented(mode, '')
+
+# Z
+def ZOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(utilities.formatNum(x // y))
+		stack.append(utilities.formatNum(x % y))
+	elif mode == 2: # num, str
+		result = []
+		x = int(x)
+		if x < 1 or x > len(y):
+			raise ValueError("invalid size for unzipping: "+str(x))
+		for i in range(x):
+			index = i
+			step = []
+			while index < len(y):
+				step.append(y[index])
+				index += x
+			result.append(''.join(step))
+		stack.append(result)
+	elif mode == 3: # num, list
+		result = []
+		x = int(x)
+		if x < 1 or x > len(y):
+			raise ValueError("invalid size for unzipping: "+str(x))
+		for i in range(x):
+			index = i
+			step = []
+			while index < len(y):
+				step.append(y[index])
+				index += x
+			result.append(step)
+		stack.append(result)
+	elif mode == 4: # str, num
+		result = []
+		y = int(y)
+		if y < 1 or y > len(x):
+			raise ValueError("invalid size for unzipping "+str(y))
+		for i in range(y):
+			index = i
+			step = []
+			while index < len(x):
+				step.append(x[index])
+				index += y
+			result.append(''.join(step))
+		stack.append(result)
+	elif mode == 5 or mode == 9: # str, str; list, list
+		result = []
+		minlen = min(len(x), len(y))
+		for i in range(minlen):
+			result.append(x[i])
+			result.append(y[i])
+		result += x[minlen:] + y[minlen:]
+		if mode == 5:
+			result = ''.join(result)
+		stack.append(result)
+	#elif mode == 6: # str, list
+	elif mode == 7: # list, num
+		result = []
+		y = int(y)
+		if y < 1 or y > len(x):
+			raise ValueError("invalid size for unzipping "+str(y))
+		for i in range(y):
+			index = i
+			step = []
+			while index < len(x):
+				step.append(x[index])
+				index += y
+			result.append(step)
+		stack.append(result)
+	#elif mode == 8: # list, str
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -1943,8 +2027,11 @@ ops = {
 	'₵P': Operator('₵P', 0, constPOperator),
 	'₵Q': Operator('₵Q', 0, constQOperator),
 	'₵q': Operator('₵q', 0, constqOperator),
+	'₵R': Operator('₵R', 0, constROperator),
+	'₵r': Operator('₵r', 0, constrOperator),
 	'₵V': Operator('₵V', 0, constVOperator),
 	'₵v': Operator('₵v', 0, constvOperator),
+	'₵W': Operator('₵W', 0, constWOperator),
 	'₵X': Operator('₵X', 0, constXOperator),
 	'₵x': Operator('₵x', 0, constxOperator),
 	'₵Y': Operator('₵Y', 0, constYOperator),
@@ -2079,6 +2166,9 @@ ops = {
 	'B': Operator('B', 2, BOperator),
 	'C': Operator('C', 2, COperator),
 	'Ė': Operator('Ė', 2, EHighDotOperator),
+	'I': Operator('I', 2, IOperator),
+	'Ṁ': Operator('Ṁ', 2, MHighDotOperator),
+	'Ṃ': Operator('Ṃ', 2, MLowDotOperator),
 	'S': Operator('S', 2, SOperator),
 	'Z': Operator('Z', 2, ZOperator)
 

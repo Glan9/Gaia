@@ -190,7 +190,8 @@ def interpret(code):
 			elif re.match('^[₀₁₂₃₄₅₆₇₈₉]+', line):
 				# Match a repetition meta
 				num = re.match("^[₀₁₂₃₄₅₆₇₈₉]+", line).group(0)
-				func.append([num, 1, 0, (lambda n: lambda stack, ops, mode=None, x=None, y=None: [ops[0].execute(stack) for i in range(n)])(parseSubscript(num))])
+				meta = [num, 1, 0, (lambda n: lambda stack, ops, mode=None, x=None, y=None: [ops[0].execute(stack) for i in range(n)])(parseSubscript(num))]
+				func = func[:-1]+[ operators.Operator(func[-1].name+meta[0], 0, determineMetaCallStyle(meta[3], 0, func[-1])) ]
 				line = re.sub("^[₀₁₂₃₄₅₆₇₈₉]+", '', line)
 			elif line[0] in "{⟨⟪":
 				# Match a block
@@ -272,7 +273,7 @@ def interpret(code):
 					if len(func) < 2:
 						raise SyntaxError("meta "+meta[0]+" must follow 2 operators")
 					arity = meta[2]
-					func = func[:-1]+[ operators.Operator(func[-1].name+meta[0], arity, determineMetaCallStyle(meta[3], arity, func[-2], func[-1])) ]
+					func = func[:-2]+[ operators.Operator(func[-1].name+meta[0], arity, determineMetaCallStyle(meta[3], arity, func[-2], func[-1])) ]
 
 				line = line[1:]
 			else:
