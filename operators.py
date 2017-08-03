@@ -953,8 +953,11 @@ def mHighDotOperator(stack, z, mode):
 		stack.append(stack.pop(len(stack)-((z-1)%len(stack))-1))
 	#elif mode == 2: # str
 	elif mode == 3: # list
-		m = max(z)
-		stack.append([i for i in z if i==m])
+		if z==[]:
+			stack.append([])
+		else:
+			m = max(z)
+			stack.append([i for i in z if i==m])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -965,8 +968,11 @@ def mLowDotOperator(stack, z, mode):
 		stack.append(stack[len(stack)-((z-1)%len(stack))-1])
 	#elif mode == 2: # str
 	elif mode == 3: # list
-		m = min(z)
-		stack.append([i for i in z if i==m])
+		if z==[]:
+			stack.append([])
+		else:
+			m = min(z)
+			stack.append([i for i in z if i==m])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -980,8 +986,8 @@ def nHighDotOperator(stack, z, mode):
 	#elif mode == 2: # str
 	elif mode == 3: # list
 		if len(z) > 0:
-			stack.append(z[1:])
-			stack.append(z[0])
+			stack.append(z[:-1])
+			stack.append(z[-1])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -993,8 +999,8 @@ def nLowDotOperator(stack, z, mode):
 	#elif mode == 2: # str
 	elif mode == 3: # list
 		if len(z) > 0:
-			stack.append(z[:-1])
-			stack.append(z[-1])
+			stack.append(z[1:])
+			stack.append(z[0])
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1120,7 +1126,7 @@ def uLowDotOperator(stack, z, mode):
 	elif mode == 2: # str
 		stack.append([s.split() for s in z.split('\n')])
 	elif mode == 3: # list
-		stack.append('\n'.join(' '.join(utilities.castToString(w) for w in s) for s in z))
+		stack.append('\n'.join(' '.join(utilities.castToString(w) for w in s) if type(s)==list else utilities.castToString(s) for s in z))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1545,16 +1551,18 @@ def subsetOperator(stack, x, y, mode):
 		s = y if mode == 2 else x
 		n = int(x if mode == 2 else y)
 
+		char = s[0] if len(s)>0 else ' '
 		while len(s) < n:
-			s = s[0]+s
+			s = char+s
 
 		stack.append(s)
 	elif mode == 3 or mode == 7: # num, list
 		l = y if mode == 3 else x
 		n = int(x if mode == 3 else y)
 
+		ele = l[0] if len(l)>0 else 0
 		while len(l) < n:
-			l = [l[0]]+l
+			l = [ele]+l
 
 		stack.append(l)
 	elif mode == 5: # str, str
@@ -1574,8 +1582,9 @@ def supersetOperator(stack, x, y, mode):
 		s = y if mode == 2 else x
 		n = int(x if mode == 2 else y)
 
-		while len(s) < n:
-			s = s+s[-1]
+		ele = l[-1] if len(l)>0 else 0
+		while len(l) < n:
+			l = l+[ele]
 
 		stack.append(s)
 	elif mode == 3 or mode == 7: # num, list
@@ -1786,7 +1795,7 @@ def IOperator(stack, x, y, mode):
 	elif mode == 2: # num, str
 		stack.append()
 	elif mode == 3: # num, list
-		stack.append(y.index(x) if x in y else 0)
+		stack.append(y.index(x)+1 if x in y else 0)
 	elif mode == 4: # str, num
 		stack.append()
 	elif mode == 5: # str, str
@@ -1794,7 +1803,7 @@ def IOperator(stack, x, y, mode):
 	elif mode == 6: # str, list
 		stack.append()
 	elif mode == 7: # list, num
-		stack.append(x.index(y) if y in x else 0)
+		stack.append(x.index(y)+1 if y in x else 0)
 	elif mode == 8: # list, str
 		stack.append()
 	elif mode == 9: # list, list

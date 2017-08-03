@@ -91,7 +91,7 @@ def interpret(code):
 				strings.append(string[:i])
 				string = string[i+1:]
 				i = 0
-			elif string[i] == '¶':
+			elif string[i] == '¶' and (terminator=='”' or terminator==''): # Only replace ¶ with newline in a normal text string
 				string = string[:i]+"\n"+string[i+1:]
 			i += 1
 		strings.append(string)
