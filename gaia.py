@@ -66,11 +66,11 @@ def interpret(code):
 	def createBlockOperator(block, blockStr, arity):
 		
 		if arity == 0:
-			return operators.Operator( "{⟨⟪"[arity]+blockStr+"}⟩⟫"[arity], arity, lambda stack: runFunction(stack, block, arrayMarkers))
+			return operators.Operator( "{⟨⟪"[arity]+blockStr+"}⟩⟫"[arity], arity, lambda stack: runFunction(stack, block))
 		elif arity == 1:
-			return operators.Operator( "{⟨⟪"[arity]+blockStr+"}⟩⟫"[arity], arity, lambda stack, z, mode: [ stack.append(i) for i in runFunction([z], block, arrayMarkers) ])
+			return operators.Operator( "{⟨⟪"[arity]+blockStr+"}⟩⟫"[arity], arity, lambda stack, z, mode: [ stack.append(i) for i in runFunction([z], block) ])
 		elif arity == 2:
-			return operators.Operator( "{⟨⟪"[arity]+blockStr+"}⟩⟫"[arity], arity, lambda stack, x, y, mode: [ stack.append(i) for i in runFunction([x, y], block, arrayMarkers) ])
+			return operators.Operator( "{⟨⟪"[arity]+blockStr+"}⟩⟫"[arity], arity, lambda stack, x, y, mode: [ stack.append(i) for i in runFunction([x, y], block) ])
 
 
 	"""
@@ -215,31 +215,31 @@ def interpret(code):
 				if line[0] == '⇑':
 					# The +[1] on each is to make sure the list is not empty, and therefore will always evaluate the right side of the 'and'. This is hacky, but the entire thing is hacky...
 					# Call function above on whole stack
-					func.append(operators.Operator( '⇑', 0, lambda stack: callStack.append((callStack[-1]-1)%len(functions)) or runFunction(stack, functions[callStack[-1]], arrayMarkers)+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇑', 0, lambda stack: callStack.append((callStack[-1]-1)%len(functions)) or runFunction(stack, functions[callStack[-1]])+[1] and callStack.pop() ))
 				elif line[0] == '↑':
 					# Call function above as a monad
-					func.append(operators.Operator( '↑', 1, lambda stack, z, mode: callStack.append((callStack[-1]-1)%len(functions)) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '↑', 1, lambda stack, z, mode: callStack.append((callStack[-1]-1)%len(functions)) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
 				elif line[0] == '⇈':
 					# Call function above as a dyad
-					func.append(operators.Operator( '⇈', 2, lambda stack, x, y, mode: callStack.append((callStack[-1]-1)%len(functions)) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇈', 2, lambda stack, x, y, mode: callStack.append((callStack[-1]-1)%len(functions)) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
 				elif line[0] == '⇓':
 					# Call function below on whole stack
-					func.append(operators.Operator( '⇓', 0, lambda stack: callStack.append((callStack[-1]+1)%len(functions)) or runFunction(stack, functions[callStack[-1]], arrayMarkers)+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇓', 0, lambda stack: callStack.append((callStack[-1]+1)%len(functions)) or runFunction(stack, functions[callStack[-1]])+[1] and callStack.pop() ))
 				elif line[0] == '↓':
 					# Call function below as a monad
-					func.append(operators.Operator( '↓', 1, lambda stack, z, mode: callStack.append((callStack[-1]+1)%len(functions)) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '↓', 1, lambda stack, z, mode: callStack.append((callStack[-1]+1)%len(functions)) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
 				elif line[0] == '⇊':
 					# Call function below as a dyad
-					func.append(operators.Operator( '⇊', 2, lambda stack, x, y, mode: callStack.append((callStack[-1]+1)%len(functions)) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇊', 2, lambda stack, x, y, mode: callStack.append((callStack[-1]+1)%len(functions)) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
 				elif line[0] == '⇐':
 					# Call current function on whole stack
-					func.append(operators.Operator( '⇐', 0, lambda stack: callStack.append(callStack[-1]) or runFunction(stack, functions[callStack[-1]], arrayMarkers)+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇐', 0, lambda stack: callStack.append(callStack[-1]) or runFunction(stack, functions[callStack[-1]])+[1] and callStack.pop() ))
 				elif line[0] == '←':
 					# Call current function as a monad
-					func.append(operators.Operator( '←', 1, lambda stack, z, mode: callStack.append(callStack[-1]) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '←', 1, lambda stack, z, mode: callStack.append(callStack[-1]) or [ stack.append(i) for i in runFunction([z], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
 				elif line[0] == '⇇':
 					# Call current function as a dyad
-					func.append(operators.Operator( '⇇', 2, lambda stack, x, y, mode: callStack.append(callStack[-1]) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]], arrayMarkers) ]+[1] and callStack.pop() ))
+					func.append(operators.Operator( '⇇', 2, lambda stack, x, y, mode: callStack.append(callStack[-1]) or [ stack.append(i) for i in runFunction([x, y], functions[callStack[-1]]) ]+[1] and callStack.pop() ))
 				line = line[1:]
 			elif line[0] == '[':
 				# Match the opening of an array
@@ -289,13 +289,15 @@ def interpret(code):
 	stack: The stack to run on
 	func:  The function to run
 	"""
-	def runFunction(stack, func, arrayMarkers):
+	def runFunction(stack, func):
 
 		for op in func:
 			try:
-				op.execute(stack)
 
-				arrayMarkers = [max(min(i, len(stack)-op.arity), 0) for i in arrayMarkers]
+				for i in arrayMarkers:
+					arrayMarkers.insert(0, max(min(arrayMarkers.pop(), len(stack)-op.arity), 0))
+
+				op.execute(stack)
 			except Exception as error:
 				sys.stderr.write("Error while executing operator "+op.name+": "+str(error)+'\n')
 				exit(1)
@@ -325,7 +327,7 @@ def interpret(code):
 	# Running
 
 	callStack.append(len(functions)-1)
-	runFunction(stack, functions[callStack[-1]], arrayMarkers)
+	runFunction(stack, functions[callStack[-1]])
 
 ###########################
 

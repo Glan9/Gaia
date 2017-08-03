@@ -482,9 +482,12 @@ def gOperator(stack, z, mode):
 				args = args[1:]
 
 		filepath = args[0]
-		filepath = re.sub('/[^/]*$','/',filepath)
-		z = filepath+(z or re.sub('(.*/)?', '', args[0]))
-		
+		filepath = re.sub('(/|^)[^/]*$','\g<1>',filepath) # Get the filepath for where the source is
+		if z == '':
+			z = args[0] # If z is empty then use the source file
+		else:
+			z = filepath + z
+
 		stack.append(open(z, 'r', encoding='utf-8').read())
 	elif mode == 3: # list
 		gradeup = lambda l:[x[1]+1 for x in sorted([[l[i], i] for i in range(len(l))])]
