@@ -11,3 +11,7 @@ Additionally, you may [Try it online!](https://tio.run/#gaia), courtesy of [Denn
 ## Documentation
 
 Some documentation is available on the [wiki](https://github.com/splcurran/Gaia/wiki); however, the documentation is still mostly incomplete.
+
+## Bugs
+
+As Gaia is still in development, there may be a lot of bugs that I don't catch. If you find anything you think might be a bug, please report it.
