@@ -742,7 +742,10 @@ def floorOperator(stack, z, mode):
 		stack.append(z.lower())
 	elif mode == 3: # list
 		#z = [utilities.castToNumber(i) for i in z]
-		stack.append(min(z))
+		if z == []:
+			stack.append(0)
+		else:
+			stack.append(min(z))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -754,7 +757,10 @@ def ceilOperator(stack, z, mode):
 		stack.append(z.upper())
 	elif mode == 3: # list
 		#z = [utilities.castToNumber(i) for i in z]
-		stack.append(max(z))
+		if z == []:
+			stack.append(0)
+		else:
+			stack.append(max(z))
 	else:
 		monadNotImplemented(mode, '')
 
