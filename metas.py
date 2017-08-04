@@ -519,6 +519,197 @@ def findElement(stack, ops, mode = None, x = None, y = None):
 					stack.append(i)
 					return
 
+# ∫
+def sortByKey(stack, ops, mode = None, x = None, y = None):
+	result = []
+	tempStack = []
+
+	if ops[0].arity == 0:
+		raise SyntaxError("¦ can't be combined with niladic operator "+ops[0].name)
+
+	elif ops[0].arity == 1:
+
+		if mode != 3:
+			# If x is not a list
+			x = utilities.castToList(x)
+
+		for i in range(len(x)):
+			tempStack = [x[i]]
+			ops[0].execute(tempStack)
+			result.append([tempStack[-1], i])
+			tempStack=[]
+
+		result = sorted(result)
+		stack.append([x[p[1]] for p in result])
+		
+	elif ops[0].arity == 2:
+
+		if mode == 7 or mode == 8 or mode == 9:
+			# if x is a list
+			for i in range(len(x)):
+				tempStack = [x[i], y]
+				ops[0].execute(tempStack)
+				result.append([tempStack[-1], i])
+				tempStack=[]
+			result = sorted(result)
+			stack.append([x[p[1]] for p in result])
+		elif mode == 3 or mode == 6:
+			# if y is a list
+			for i in range(len(y)):
+				tempStack = [x, y[i]]
+				ops[0].execute(tempStack)
+				result.append([tempStack[-1], i])
+				tempStack=[]
+			result = sorted(result)
+			stack.append([y[p[1]] for p in result])
+		else:
+			# if neither is a list
+			x = utilities.castToList(x)
+			for i in range(len(x)):
+				tempStack = [x[i], y]
+				ops[0].execute(tempStack)
+				result.append([tempStack[-1], i])
+				tempStack=[]
+			result = sorted(result)
+			stack.append([x[p[1]] for p in result])
+
+# ⌡
+def minByKey(stack, ops, mode = None, x = None, y = None):
+	result = []
+	tempStack = []
+
+	if ops[0].arity == 0:
+		raise SyntaxError("¦ can't be combined with niladic operator "+ops[0].name)
+
+	elif ops[0].arity == 1:
+
+		if mode != 3:
+			# If x is not a list
+			x = utilities.castToList(x)
+
+		for i in range(len(x)):
+			tempStack = [x[i]]
+			ops[0].execute(tempStack)
+			result.append([tempStack[-1], i])
+			tempStack=[]
+
+		result = sorted(result)
+		if result:
+			stack.append(x[result[0][1]])
+		else:
+			stack.append(0)
+		
+	elif ops[0].arity == 2:
+
+		if mode == 7 or mode == 8 or mode == 9:
+			# if x is a list
+			for i in range(len(x)):
+				tempStack = [x[i], y]
+				ops[0].execute(tempStack)
+				result.append([tempStack[-1], i])
+				tempStack=[]
+
+			result = sorted(result)
+			if result:
+				stack.append(x[result[0][1]])
+			else:
+				stack.append(0)
+		elif mode == 3 or mode == 6:
+			# if y is a list
+			for i in range(len(y)):
+				tempStack = [x, y[i]]
+				ops[0].execute(tempStack)
+				result.append([tempStack[-1], i])
+				tempStack=[]
+
+			result = sorted(result)
+			if result:
+				stack.append(y[result[0][1]])
+			else:
+				stack.append(0)
+		else:
+			# if neither is a list
+			x = utilities.castToList(x)
+			for i in range(len(x)):
+				tempStack = [x[i], y]
+				ops[0].execute(tempStack)
+				result.append([tempStack[-1], i])
+				tempStack=[]
+
+			result = sorted(result)
+			if result:
+				stack.append(x[result[0][1]])
+			else:
+				stack.append(0)
+
+# ⌠
+def maxByKey(stack, ops, mode = None, x = None, y = None):
+	result = []
+	tempStack = []
+
+	if ops[0].arity == 0:
+		raise SyntaxError("¦ can't be combined with niladic operator "+ops[0].name)
+
+	elif ops[0].arity == 1:
+
+		if mode != 3:
+			# If x is not a list
+			x = utilities.castToList(x)
+
+		for i in range(len(x)):
+			tempStack = [x[i]]
+			ops[0].execute(tempStack)
+			result.append([tempStack[-1], i])
+			tempStack=[]
+
+		result = sorted(result)
+		if result:
+			stack.append(x[result[-1][1]])
+		else:
+			stack.append(0)
+		
+	elif ops[0].arity == 2:
+
+		if mode == 7 or mode == 8 or mode == 9:
+			# if x is a list
+			for i in range(len(x)):
+				tempStack = [x[i], y]
+				ops[0].execute(tempStack)
+				result.append([tempStack[-1], i])
+				tempStack=[]
+				
+			result = sorted(result)
+			if result:
+				stack.append(x[result[-1][1]])
+			else:
+				stack.append(0)
+		elif mode == 3 or mode == 6:
+			# if y is a list
+			for i in range(len(y)):
+				tempStack = [x, y[i]]
+				ops[0].execute(tempStack)
+				result.append([tempStack[-1], i])
+				tempStack=[]
+
+			result = sorted(result)
+			if result:
+				stack.append(y[result[-1][1]])
+			else:
+				stack.append(0)
+		else:
+			# if neither is a list
+			x = utilities.castToList(x)
+			for i in range(len(x)):
+				tempStack = [x[i], y]
+				ops[0].execute(tempStack)
+				result.append([tempStack[-1], i])
+				tempStack=[]
+
+			result = sorted(result)
+			if result:
+				stack.append(x[result[-1][1]])
+			else:
+				stack.append(0)
 
 """
 METAS DICT
@@ -548,5 +739,8 @@ metas = {
 	'↻': ['↻', 2, 0, untilLoop],
 	'∞': ['∞', 1, 0, infiniteLoop],
 	'∆': ['∆', 1, -1, findIndex],
-	'∇': ['∇', 1, -1, findElement]
+	'∇': ['∇', 1, -1, findElement],
+	'∫': ['∫', 1, -1, sortByKey],
+	'⌡': ['⌡', 1, -1, minByKey],
+	'⌠': ['⌠', 1, -1, maxByKey]
 }

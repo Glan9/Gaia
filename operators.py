@@ -1830,8 +1830,18 @@ def MHighDotOperator(stack, x, y, mode):
 		stack.append(max(x,y))
 	elif mode == 2: # num, str
 		stack.append()
-	#elif mode == 3 or mode == 7: # num, list; list, num
-		# Not sure how to implement this yet
+	elif mode == 3 or mode == 7: # num, list; list, num
+		n = x if mode == 3 else y
+		l = y if mode == 3 else x
+
+		n = int(n)%4
+		l = [i if type(i) == list else [i] for i in l]
+
+		for i in range(n):
+			width = max(len(i) for i in l)
+			l = [[e[j] for e in l if e[j] != None] for j in range(width-1, -1, -1)]
+
+		stack.append(l)
 	elif mode == 4: # str, num
 		stack.append()
 	elif mode == 5: # str, str
@@ -1851,8 +1861,18 @@ def MLowDotOperator(stack, x, y, mode):
 		stack.append(min(x,y))
 	elif mode == 2: # num, str
 		stack.append()
-	#elif mode == 3 or mode == 7: # num, list; list, num
-		# Not sure how to implement this yet
+	elif mode == 3 or mode == 7: # num, list; list, num
+		n = x if mode == 3 else y
+		l = y if mode == 3 else x
+
+		n = int(n)%4
+		l = [i if type(i) == list else [i] for i in l]
+
+		for i in range(n):
+			width = max(len(i) for i in l)
+			l = [[e[j] for e in l[::-1] if e[j] != None] for j in range(width)]
+
+		stack.append(l)
 	elif mode == 4: # str, num
 		stack.append()
 	elif mode == 5: # str, str
