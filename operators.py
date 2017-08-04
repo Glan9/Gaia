@@ -1066,7 +1066,7 @@ def rHighDotOperator(stack, z, mode):
 def rLowDotOperator(stack, z, mode):
 	random.seed()
 	if mode == 1:   # num
-		stack.append(random.randint(1, int(z)))
+		stack.append(random.randint(1, int(z)+1))
 	elif mode == 2: # str
 		stack.append(random.choice(z))
 	elif mode == 3: # list
