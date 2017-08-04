@@ -1583,7 +1583,7 @@ def subsetOperator(stack, x, y, mode):
 # ⊃
 def supersetOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		stack.append(1 if x >= y else 0)
+		stack.append(1 if x <= y else 0)
 	elif mode == 2 or mode == 4: # num, str; str, num
 		s = y if mode == 2 else x
 		n = int(x if mode == 2 else y)
