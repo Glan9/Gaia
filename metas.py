@@ -525,7 +525,7 @@ def sortByKey(stack, ops, mode = None, x = None, y = None):
 	tempStack = []
 
 	if ops[0].arity == 0:
-		raise SyntaxError("¦ can't be combined with niladic operator "+ops[0].name)
+		raise SyntaxError("∫ can't be combined with niladic operator "+ops[0].name)
 
 	elif ops[0].arity == 1:
 
@@ -579,7 +579,7 @@ def minByKey(stack, ops, mode = None, x = None, y = None):
 	tempStack = []
 
 	if ops[0].arity == 0:
-		raise SyntaxError("¦ can't be combined with niladic operator "+ops[0].name)
+		raise SyntaxError("⌡ can't be combined with niladic operator "+ops[0].name)
 
 	elif ops[0].arity == 1:
 
@@ -648,7 +648,7 @@ def maxByKey(stack, ops, mode = None, x = None, y = None):
 	tempStack = []
 
 	if ops[0].arity == 0:
-		raise SyntaxError("¦ can't be combined with niladic operator "+ops[0].name)
+		raise SyntaxError("⌠ can't be combined with niladic operator "+ops[0].name)
 
 	elif ops[0].arity == 1:
 
