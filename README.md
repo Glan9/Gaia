@@ -10,7 +10,7 @@ Additionally, you may [Try it online!](https://tio.run/#gaia), courtesy of [Denn
 
 ## Documentation
 
-Some documentation is available on the [wiki](https://github.com/splcurran/Gaia/wiki); however, the documentation is still mostly incomplete.
+Some documentation is available on the [wiki](https://github.com/splcurran/Gaia/wiki).
 
 ## Bugs
 
