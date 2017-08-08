@@ -1555,6 +1555,44 @@ def pipeOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
+# «
+def leftArrowQuoteOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(int(x) << int(y))
+	elif mode == 2: # num, str
+		stack.append(y[int(x):]+y[:int(x)])
+	elif mode == 3: # num, list
+		stack.append(y[int(x):]+y[:int(x)])
+	elif mode == 4: # str, num
+		stack.append(x[int(y):]+x[:int(y)])
+	#elif mode == 5: # str, str
+	#elif mode == 6: # str, list
+	elif mode == 7: # list, num
+		stack.append(x[int(y):]+x[:int(y)])
+	#elif mode == 8: # list, str
+	#elif mode == 9: # list, list
+	else:
+		dyadNotImplemented(mode, '')
+
+# »
+def rightArrowQuoteOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(int(x) >> int(y))
+	elif mode == 2: # num, str
+		stack.append(y[-int(x):]+y[:-int(x)])
+	elif mode == 3: # num, list
+		stack.append(y[-int(x):]+y[:-int(x)])
+	elif mode == 4: # str, num
+		stack.append(x[-int(y):]+x[:-int(y)])
+	#elif mode == 5: # str, str
+	#elif mode == 6: # str, list
+	elif mode == 7: # list, num
+		stack.append(x[-int(y):]+x[:-int(y)])
+	#elif mode == 8: # list, str
+	#elif mode == 9: # list, list
+	else:
+		dyadNotImplemented(mode, '')
+
 # ⊂
 def subsetOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
@@ -1896,7 +1934,10 @@ def MLowDotOperator(stack, x, y, mode):
 # S
 def SOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
-		1# Not implemented
+		(x,y) = (int(x), int(y))
+		while y != 0:
+			(x,y) = (y,x%y)
+		stack.append(x)
 	elif mode == 2 or mode == 3: # num, str; num, list
 		stack.append([y[:int(x)], y[int(x):]])
 	elif mode == 4 or mode == 7: # str, num; list, num
@@ -2201,6 +2242,8 @@ ops = {
 	'>': Operator('>', 2, greaterThanOperator),
 	'^': Operator('^', 2, caretOperator),
 	'|': Operator('|', 2, pipeOperator),
+	'«': Operator('«', 2, leftArrowQuoteOperator),
+	'»': Operator('»', 2, rightArrowQuoteOperator),
 	'⊂': Operator('⊂', 2, subsetOperator),
 	'⊃': Operator('⊃', 2, supersetOperator),
 	'∧': Operator('∧', 2, andOperator),

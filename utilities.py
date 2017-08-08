@@ -59,8 +59,7 @@ def getInput():
 			if match.group(2): # Only do float parsing if it actually has a fractional part
 				value = formatNum(float(line))
 			else:
-				value = int(line)
-			return
+				value = int(match.group(0))
 
 		elif re.match("^\s*“[^”]*”\s*$", line):
 			value = re.match("^\s*“([^”]*)”\s*$", line).group(1)
