@@ -53,8 +53,17 @@ def getInput():
 	try:
 		line = input().strip()
 		value = None
-		if re.match("^-?(\d+(\.\d+)?|\.\d+)$", line):
-			value = formatNum(float(line))
+
+		match = re.match("^-?(\d+(\.\d+)?|\.\d+)$", line)
+		if match:
+			if match.group(2): # Only do float parsing if it actually has a fractional part
+				value = formatNum(float(line))
+			else:
+				value = int(line)
+			return
+
+		elif re.match("^\s*“[^”]*”\s*$", line):
+			value = re.match("^\s*“([^”]*)”\s*$", line).group(1)
 		else:
 			value = line
 		inputs.append(value)

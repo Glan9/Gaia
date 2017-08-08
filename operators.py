@@ -131,6 +131,10 @@ def sectionOperator(stack):
 def atOperator(stack):
 	stack.append(utilities.getInput())
 
+# €.
+def extDotOperator(stack):
+	print('STACK: '+utilities.outputFormat(stack))
+
 # ₵a
 def constaOperator(stack):
 	stack.append('abcdefghijklmnopqrstuvwxyz')
@@ -806,23 +810,24 @@ def cHighDotOperator(stack, z, mode):
 	else:
 		monadNotImplemented(mode, '')
 
-# ḋ
+# 
 def dHighDotOperator(stack, z, mode):
 	if mode == 1:   # num
 		z = int(z)
 		if z < 4:
-			stack.append([z])
-		p = 0
-		result = []
-		while z > 1:
-			count = 0
-			while z%utilities.getPrime(p) == 0:
-				z //= utilities.getPrime(p)
-				count += 1
-			if count > 0:
-				result.append([utilities.getPrime(p), count])
-			p += 1
-		stack.append(result)
+			stack.append([z, 1])
+		else:
+			p = 0
+			result = []
+			while z > 1:
+				count = 0
+				while z%utilities.getPrime(p) == 0:
+					z //= utilities.getPrime(p)
+					count += 1
+				if count > 0:
+					result.append([utilities.getPrime(p), count])
+				p += 1
+			stack.append(result)
 	elif mode == 2 or mode == 3: # str or list
 		if len(z)==0:
 			stack.append([])
@@ -841,14 +846,15 @@ def dLowDotOperator(stack, z, mode):
 		z = int(z)
 		if z < 4:
 			stack.append([z])
-		p = 0
-		result = []
-		while z > 1:
-			while z%utilities.getPrime(p) == 0:
-				result.append(utilities.getPrime(p))
-				z //= utilities.getPrime(p)
-			p += 1
-		stack.append(result)
+		else:
+			p = 0
+			result = []
+			while z > 1:
+				while z%utilities.getPrime(p) == 0:
+					result.append(utilities.getPrime(p))
+					z //= utilities.getPrime(p)
+				p += 1
+			stack.append(result)
 	elif mode == 2 or mode == 3: # str or list
 		def partitions(z):
 			if len(z) == 0:
@@ -1588,17 +1594,18 @@ def supersetOperator(stack, x, y, mode):
 		s = y if mode == 2 else x
 		n = int(x if mode == 2 else y)
 
-		ele = l[-1] if len(l)>0 else 0
-		while len(l) < n:
-			l = l+[ele]
+		char = s[-1] if len(s)>0 else ' '
+		while len(s) < n:
+			s = s+char
 
 		stack.append(s)
 	elif mode == 3 or mode == 7: # num, list
 		l = y if mode == 3 else x
 		n = int(x if mode == 3 else y)
 
+		ele = l[-1] if len(l)>0 else 0
 		while len(l) < n:
-			l = l+[l[-1]]
+			l = l+[ele]
 
 		stack.append(l)
 	elif mode == 5: # str, str
@@ -1807,11 +1814,11 @@ def IOperator(stack, x, y, mode):
 	elif mode == 5: # str, str
 		stack.append(x.find(y)+1)
 	elif mode == 6: # str, list
-		stack.append()
+		stack.append(y.index(x)+1 if x in y else 0)
 	elif mode == 7: # list, num
 		stack.append(x.index(y)+1 if y in x else 0)
 	elif mode == 8: # list, str
-		stack.append()
+		stack.append(x.index(y)+1 if y in x else 0)
 	elif mode == 9: # list, list
 		if len(y)>len(x):
 			stack.append(0)
@@ -2054,6 +2061,7 @@ Each value should be an Operator object
 
 ops = {
 	# Nilads
+	'€.': Operator('€.', 0, extDotOperator),
 	'₵A': Operator('₵A', 0, constAOperator),
 	'₵a': Operator('₵a', 0, constaOperator),
 	'₵C': Operator('₵C', 0, constCOperator),
