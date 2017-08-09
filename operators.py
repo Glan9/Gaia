@@ -776,7 +776,7 @@ def sigmaOperator(stack, z, mode):
 		stack.append(sum(tempStack[0]))
 	#elif mode == 2: # str
 	elif mode == 3: # list
-		stack.append(sum(utilities.castToNumber(i) for i in utilities.flatten(z)))
+		stack.append(sum(utilities.castToNumber(i) for i in z))
 	else:
 		monadNotImplemented(mode, '')
 
@@ -1884,7 +1884,7 @@ def MHighDotOperator(stack, x, y, mode):
 
 		for i in range(n):
 			width = max(len(i) for i in l)
-			l = [[e[j] for e in l if e[j] != None] for j in range(width-1, -1, -1)]
+			l = [[e[j] for e in l if len(e)>j] for j in range(width-1, -1, -1)]
 
 		stack.append(l)
 	elif mode == 4: # str, num
@@ -1915,7 +1915,7 @@ def MLowDotOperator(stack, x, y, mode):
 
 		for i in range(n):
 			width = max(len(i) for i in l)
-			l = [[e[j] for e in l[::-1] if e[j] != None] for j in range(width)]
+			l = [[e[j] for e in l[::-1] if len(e)>j] for j in range(width)]
 
 		stack.append(l)
 	elif mode == 4: # str, num
