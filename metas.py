@@ -372,7 +372,7 @@ def whileLoop(stack, ops, mode = None, x = None, y = None):
 	while True:
 		ops[0].execute(stack)
 
-		if stack[-1]:
+		if stack.pop():
 			ops[1].execute(stack)
 		else:
 			break
@@ -383,7 +383,7 @@ def untilLoop(stack, ops, mode = None, x = None, y = None):
 	while True:
 		ops[0].execute(stack)
 
-		if not stack[-1]:
+		if not stack.pop():
 			ops[1].execute(stack)
 		else:
 			break
