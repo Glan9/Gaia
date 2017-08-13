@@ -313,7 +313,7 @@ def datetOperator(stack):
 
 # ∂T
 def dateTOperator(stack):
-	stack.append([datetime.datetime.today().hour%12 or 12, 1 if datetime.datetime.today().hour >= 12 else 0, datetime.datetime.today().minute, datetime.datetime.today().second])
+	stack.append([datetime.datetime.today().hour%12 or 12, datetime.datetime.today().minute, datetime.datetime.today().second, 1 if datetime.datetime.today().hour >= 12 else 0])
 
 # ∂s
 def datesOperator(stack):
@@ -1294,7 +1294,12 @@ def ampersandOperator(stack, x, y, mode):
 			result += (i if mode == 2 or mode == 4 else [i])*abs(n)
 
 		stack.append(result[::-1 if n<0 else 1])
-	#elif mode == 5: # str, str
+	elif mode == 5: # str, str
+		result = ""
+		for c in x:
+			if c in y and c not in result:
+				result += c
+		stack.append(result)
 	#elif mode == 6: # str, list
 	#elif mode == 8: # list, str
 	elif mode == 9: # list, list
@@ -1311,16 +1316,19 @@ def asteriskOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(utilities.formatNum(x ** y))
 	#elif mode == 2: # num, str
-	elif mode == 3: # num, list
-		if x == 0:
+	elif mode == 3 or mode == 7: # num, list; list, num
+		n = x if mode == 3 else y
+		l = y if mode == 3 else x
+
+		if n == 0:
 			stack.append([])
 			return
-		elif x < 0:
+		elif n < 0:
 			raise ValueError("can't do Cartesian power with negative exponent")
 
-		start = [[i] for i in y]
+		start = [[i] for i in l]
 		result = start
-		for i in range(int(x)-1):
+		for i in range(int(n)-1):
 			result = [i+j for i in result for j in start]
 
 		stack.append(result)
@@ -1328,19 +1336,6 @@ def asteriskOperator(stack, x, y, mode):
 	elif mode == 5: # str, str
 		stack.append(''.join(i for i in x if i in y))
 	#elif mode == 6: # str, list
-	elif mode == 7: # list, num
-		if y == 0:
-			stack.append([])
-			return
-		elif y < 0:
-			raise ValueError("can't do Cartesian power with negative exponent")
-
-		start = [[i] for i in x]
-		result = start
-		for i in range(int(y)-1):
-			result = [i+j for i in result for j in start]
-
-		stack.append(result)
 	#elif mode == 8: # list, str
 	elif mode == 9: # list, list
 		stack.append([i for i in x if i in y])
@@ -1516,7 +1511,18 @@ def caretOperator(stack, x, y, mode):
 	#elif mode == 2: # num, str
 	#elif mode == 3: # num, list
 	#elif mode == 4: # str, num
-	#elif mode == 5: # str, str
+	elif mode == 5: # str, str
+		result = ""
+
+		for c in x:
+			if c not in y and c not in result:
+				result += c
+
+		for c in y:
+			if c not in x and c not in result:
+				result += c
+
+		stack.append(result)
 	#elif mode == 6: # str, list
 	#elif mode == 7: # list, num
 	#elif mode == 8: # list, str
@@ -1542,7 +1548,12 @@ def pipeOperator(stack, x, y, mode):
 	#elif mode == 2: # num, str
 	#elif mode == 3: # num, list
 	#elif mode == 4: # str, num
-	#elif mode == 5: # str, str
+	elif mode == 5: # str, str
+		result = ""
+		for c in x+y:
+			if c not in result:
+				result += c
+		stack.append(result)
 	#elif mode == 6: # str, list
 	#elif mode == 7: # list, num
 	#elif mode == 8: # list, str
@@ -1565,12 +1576,14 @@ def leftArrowQuoteOperator(stack, x, y, mode):
 		stack.append(y[int(x):]+y[:int(x)])
 	elif mode == 4: # str, num
 		stack.append(x[int(y):]+x[:int(y)])
-	#elif mode == 5: # str, str
+	elif mode == 5: # str, str
+		stack.append(1 if (x[:len(y)] == y) else 0)
 	#elif mode == 6: # str, list
 	elif mode == 7: # list, num
 		stack.append(x[int(y):]+x[:int(y)])
 	#elif mode == 8: # list, str
-	#elif mode == 9: # list, list
+	elif mode == 9: # list, list
+		stack.append(1 if (x[:len(y)] == y) else 0)
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -1584,12 +1597,14 @@ def rightArrowQuoteOperator(stack, x, y, mode):
 		stack.append(y[-int(x):]+y[:-int(x)])
 	elif mode == 4: # str, num
 		stack.append(x[-int(y):]+x[:-int(y)])
-	#elif mode == 5: # str, str
+	elif mode == 5: # str, str
+		stack.append(1 if (x[-len(y):] == y) else 0)
 	#elif mode == 6: # str, list
 	elif mode == 7: # list, num
 		stack.append(x[-int(y):]+x[:-int(y)])
 	#elif mode == 8: # list, str
-	#elif mode == 9: # list, list
+	elif mode == 9: # list, list
+		stack.append(1 if (x[-len(y):] == y) else 0)
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -1737,11 +1752,6 @@ def divisionOperator(stack, x, y, mode):
 
 		result.append(l)
 		stack.append(result)
-
-	elif mode == 7: # list, num
-		if y <= 0:
-			raise ValueError("invalid size for splitting: "+str(int(y)))
-		stack.append([x[i:i+int(y)] for i in range(0, len(x), int(y))])
 	elif mode == 9: # list, list
 		result = []
 		i=0
@@ -1766,7 +1776,8 @@ def minusOperator(stack, x, y, mode):
 	elif mode == 3: # num, list
 		stack.append([i for i in y if i != x])
 	#elif mode == 4: # str, num
-	#elif mode == 5: # str, str
+	elif mode == 5: # str, str
+		stack.append(''.join(c for c in x if c not in y))
 	elif mode == 6: # str, list
 		stack.append([i for i in y if i != x])
 	elif mode == 7: # list, num
@@ -1789,7 +1800,7 @@ def BOperator(stack, x, y, mode):
 	elif mode == 4: # str, num
 		stack.append(''.join(x[i] for i in utilities.toBase(int(y), len(x))))
 	elif mode == 5: # str, str
-		digitList = [0 if y.find(c)==-1 else y.find(c) for c in x]
+		digitList = [y.find(c) if c in y else 0 for c in x]
 		stack.append(utilities.fromBase(digitList, len(y)))
 	#elif mode == 6: # str, list
 	elif mode == 7: # list, num
@@ -1815,7 +1826,87 @@ def COperator(stack, x, y, mode):
 		stack.append(x.count(y))
 	elif mode == 8: # list, str
 		stack.append(x.count(y))
-	#elif mode == 9: # list, list
+	elif mode == 9: # list, list
+		count = 0
+		i = 0
+		while i < len(x):
+			if x[i:i+len(y)] == y:
+				count += 1
+				i += len(y)
+			else:
+				i += 1
+		stack.append(count)
+	else:
+		dyadNotImplemented(mode, '')
+
+# D
+def DOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(abs(x-y))
+	elif mode == 2 or mode == 4: # num, str; str num
+		n = x if mode == 2 else y
+		s = y if mode == 2 else x
+
+		if s == "":
+			stack.append("")
+		else:
+			index = (int(n)-1)%len(s)
+			stack.append(s[:index]+s[index+1:])
+	elif mode == 3 or mode == 7: # num, list; list, num
+		n = x if mode == 3 else y
+		l = y if mode == 3 else x
+
+		if l == []:
+			stack.append([])
+		else:
+			index = (int(n)-1)%len(l)
+			stack.append(l[:index]+l[index+1:])
+	elif mode == 5 or mode == 9: # str, str; list, list
+		(x, y) = (list(x[:]), list(y[:]))
+		for i in y:
+			if i in x:
+				x.remove(i)
+
+		if mode == 5:
+			x = ''.join(x)
+		stack.append(x)
+	#elif mode == 6: # str, list
+	#elif mode == 8: # list, str
+	else:
+		dyadNotImplemented(mode, '')
+
+# E
+def EOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(x * 10**y)
+	elif mode == 2 or mode == 4 or mode == 3 or mode == 7: # num, str
+		n = x if mode < 4 else y
+		s = y if mode < 4 else x
+
+		if len(s) == 0:
+			stack.append(s)
+		else:
+			index = (int(n)-1)%len(s)
+
+			stack.append(s[:index]+s[index+1:])
+			stack.append(s[index])
+	#elif mode == 5: # str, str
+	#elif mode == 6: # str, list
+	#elif mode == 8: # list, str
+	elif mode == 9: # list, list
+		if x == []:
+			stack.append([])
+		else:
+			splits = [int(i)%len(x) for i in y]
+			indices = [(i-1)%len(x) for i in y]
+
+			result = x[:splits[0]-1]
+			for i in range(1,len(splits)):
+				result += x[splits[i-1]:splits[i]-1]
+			result += x[splits[-1]:]
+
+			stack.append(result)
+			stack.append([x[i] for i in indices])
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -1869,43 +1960,51 @@ def IOperator(stack, x, y, mode):
 	else:
 		dyadNotImplemented(mode, '')
 
+# K
+def KOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		n = int(x)
+		k = int(y)
+		if k < 0 or k > n:
+			stack.append(0)
+		else:
+			stack.append(math.factorial(n)/(math.factorial(k)*math.factorial(n-k)))
+	#elif mode == 2: # num, str
+	elif mode == 3 or mode == 7: # num, list
+		n = int(x if mode == 3 else y)
+		l = y if mode == 3 else x
+
+		def subsets(l, n):
+			if l == [] or n > len(l) or n < 0:
+				return []
+			elif n == len(l):
+				return [l]
+			elif n == 0:
+				return [[]]
+			elif n == 1:
+				return [[i] for i in l]
+			else:
+				result = []
+				for i in range(len(l)-n+1):
+					result += [[l[i]] + s for s in subsets(l[i+1:], n-1)]
+				return result
+
+		stack.append(subsets(l, n))
+	#elif mode == 4: # str, num
+	elif mode == 5: # str, str
+		stack.append(''.join(c for c in x if c in y))
+	#elif mode == 6: # str, list
+	#elif mode == 8: # list, str
+	elif mode == 9: # list, list
+		stack.append([i for i in x if i in y])
+	else:
+		dyadNotImplemented(mode, '')
+
 # Ṁ
 def MHighDotOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(max(x,y))
-	elif mode == 2: # num, str
-		stack.append()
-	elif mode == 3 or mode == 7: # num, list; list, num
-		n = x if mode == 3 else y
-		l = y if mode == 3 else x
-
-		n = int(n)%4
-		l = [i if type(i) == list else [i] for i in l]
-
-		for i in range(n):
-			width = max(len(i) for i in l)
-			l = [[e[j] for e in l if len(e)>j] for j in range(width-1, -1, -1)]
-
-		stack.append(l)
-	elif mode == 4: # str, num
-		stack.append()
-	elif mode == 5: # str, str
-		stack.append(max(x,y))
-	elif mode == 6: # str, list
-		stack.append()
-	elif mode == 8: # list, str
-		stack.append()
-	elif mode == 9: # list, list
-		stack.append(max(x,y))
-	else:
-		dyadNotImplemented(mode, '')
-
-# Ṃ
-def MLowDotOperator(stack, x, y, mode):
-	if mode == 1:   # num, num
-		stack.append(min(x,y))
-	elif mode == 2: # num, str
-		stack.append()
+	#elif mode == 2: # num, str
 	elif mode == 3 or mode == 7: # num, list; list, num
 		n = x if mode == 3 else y
 		l = y if mode == 3 else x
@@ -1918,16 +2017,84 @@ def MLowDotOperator(stack, x, y, mode):
 			l = [[e[j] for e in l[::-1] if len(e)>j] for j in range(width)]
 
 		stack.append(l)
-	elif mode == 4: # str, num
-		stack.append()
+	#elif mode == 4: # str, num
+	elif mode == 5: # str, str
+		stack.append(max(x,y))
+	#elif mode == 6: # str, list
+	#elif mode == 8: # list, str
+	elif mode == 9: # list, list
+		stack.append(max(x,y))
+	else:
+		dyadNotImplemented(mode, '')
+
+# Ṃ
+def MLowDotOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(min(x,y))
+	#elif mode == 2: # num, str
+	elif mode == 3 or mode == 7: # num, list; list, num
+		n = x if mode == 3 else y
+		l = y if mode == 3 else x
+
+		n = int(n)%4
+		l = [i if type(i) == list else [i] for i in l]
+
+		for i in range(n):
+			width = max(len(i) for i in l)
+			l = [[e[j] for e in l if len(e)>j] for j in range(width-1, -1, -1)]
+
+		stack.append(l)
+	#elif mode == 4: # str, num
 	elif mode == 5: # str, str
 		stack.append(min(x,y))
-	elif mode == 6: # str, list
-		stack.append()
-	elif mode == 8: # list, str
-		stack.append()
+	#elif mode == 6: # str, list
+	#elif mode == 8: # list, str
 	elif mode == 9: # list, list
 		stack.append(min(x,y))
+	else:
+		dyadNotImplemented(mode, '')
+
+# N
+def NOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		x = int(x)
+		y = int(y)
+		if x == y:
+			stack.append([])
+		elif y < x:
+			stack.append(list(range(x, y, -1)))
+		else:
+			stack.append(list(range(x, y)))
+	#elif mode == 2: # num, str
+	#elif mode == 3: # num, list
+	#elif mode == 4: # str, num
+	elif mode == 5: # str, str
+		x = x[:]
+		y = list(y[:])
+
+		result = ""
+
+		for i in x:
+			if i in y:
+				result += i
+				y.remove(i)
+
+		stack.append(result)
+	#elif mode == 6: # str, list
+	#elif mode == 7: # list, num
+	#elif mode == 8: # list, str
+	elif mode == 9: # list, list
+		x = x[:]
+		y = y[:]
+
+		result = []
+
+		for i in x:
+			if i in y:
+				result.append(i)
+				y.remove(i)
+
+		stack.append(result)
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -1937,7 +2104,7 @@ def SOperator(stack, x, y, mode):
 		(x,y) = (int(x), int(y))
 		while y != 0:
 			(x,y) = (y,x%y)
-		stack.append(x)
+		stack.append(1 if x == 1 else 0)
 	elif mode == 2 or mode == 3: # num, str; num, list
 		stack.append([y[:int(x)], y[int(x):]])
 	elif mode == 4 or mode == 7: # str, num; list, num
@@ -1951,7 +2118,6 @@ def SOperator(stack, x, y, mode):
 			stack.append([l[:index], l[index+1:]])
 		else:
 			stack.append(l)
-	#elif mode == 4: # str, num
 	elif mode == 5: # str, str
 		s = x.split(y)
 		stack.append([s[0], y.join(s[1:])])
@@ -1961,6 +2127,46 @@ def SOperator(stack, x, y, mode):
 				stack.append([x[:i], x[i+len(y):]])
 				return
 		stack.append(x)
+	else:
+		dyadNotImplemented(mode, '')
+
+# U
+def UOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		x = int(x)
+		y = int(y)
+		if x == y:
+			stack.append([x])
+		elif y < x:
+			stack.append(list(range(x, y-1, -1)))
+		else:
+			stack.append(list(range(x, y+1)))
+	#elif mode == 2: # num, str
+	#elif mode == 3: # num, list
+	#elif mode == 4: # str, num
+	elif mode == 5: # str, str
+		x = x[:]
+		y = list(y[:])
+
+		result = ""
+
+		for i in x:
+			if i in y:
+				y.remove(i)
+
+		stack.append(x + ''.join(y))
+	#elif mode == 6: # str, list
+	#elif mode == 7: # list, num
+	#elif mode == 8: # list, str
+	elif mode == 9: # list, list
+		x = x[:]
+		y = y[:]
+
+		for i in x:
+			if i in y:
+				y.remove(i)
+
+		stack.append(x+y)
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -2254,11 +2460,16 @@ ops = {
 	'¤': Operator('¤', 2, currencyOperator),
 	'B': Operator('B', 2, BOperator),
 	'C': Operator('C', 2, COperator),
+	'D': Operator('D', 2, DOperator),
+	'E': Operator('E', 2, EOperator),
 	'Ė': Operator('Ė', 2, EHighDotOperator),
 	'I': Operator('I', 2, IOperator),
+	'K': Operator('K', 2, KOperator),
+	'N': Operator('N', 2, NOperator),
 	'Ṁ': Operator('Ṁ', 2, MHighDotOperator),
 	'Ṃ': Operator('Ṃ', 2, MLowDotOperator),
 	'S': Operator('S', 2, SOperator),
+	'U': Operator('U', 2, UOperator),
 	'Z': Operator('Z', 2, ZOperator)
 
 
