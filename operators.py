@@ -995,7 +995,10 @@ def nHighDotOperator(stack, z, mode):
 			stack.append(utilities.getPrimes(int(z)))
 		else:
 			stack.append([])
-	#elif mode == 2: # str
+	elif mode == 2: # str
+		if len(z) > 0:
+			stack.append(z[:-1])
+			stack.append(z[-1])
 	elif mode == 3: # list
 		if len(z) > 0:
 			stack.append(z[:-1])
@@ -1008,7 +1011,10 @@ def nLowDotOperator(stack, z, mode):
 	if mode == 1:   # num
 		if (z > 0):
 			stack.append(utilities.getPrime(int(z)))
-	#elif mode == 2: # str
+	elif mode == 2: # str
+		if len(z) > 0:
+			stack.append(z[1:])
+			stack.append(z[0])
 	elif mode == 3: # list
 		if len(z) > 0:
 			stack.append(z[1:])
@@ -1273,11 +1279,37 @@ def percentOperator(stack, x, y, mode):
 			result += [i, y]
 		result .append(s[-1])
 		stack.append(result)
-	#elif mode == 6: # str, list
+	elif mode == 6 or mode == 8: # str, list; list, str
+		s = x if mode == 6 else y
+		l = y if mode == 6 else x
+
+		result = []
+		start = 0
+
+		for i in range(len(l)):
+			if l[i] == s:
+				result.append(l[start:i])
+				result.append([s])
+				start = i+1
+		result.append(l[start:])
+
+		stack.append(result)
 	elif mode == 7: # list, num
 		stack.append(x[::int(y)])
-	#elif mode == 8: # list, str
-	#elif mode == 9: # list, list
+	elif mode == 9: # list, list
+		result = []
+		i=0
+		while i<len(x):
+			if x[i:i+len(y)] == y:
+				result.append(x[:i])
+				result.append(y)
+				x = x[i+len(y):]
+				i = 0
+			else:
+				i += 1
+
+		result.append(x)
+		stack.append(result)
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -1809,15 +1841,53 @@ def BOperator(stack, x, y, mode):
 	#elif mode == 9: # list, list
 	else:
 		dyadNotImplemented(mode, '')
+"""
+# Ḅ
+def BLowDotOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append()
+	elif mode == 2: # num, str
+		stack.append()
+	elif mode == 3 or mode == 7: # num, list; list, num
+		n = int(x if mode == 3 else y)
+		l = y if mode == 3 else x
 
+		result = []
+
+		for i in l[::-1]:
+			(n,r) = divmod(n, i)
+			result.insert(0, r)
+			if n == 0:
+				break
+		
+		if n != 0:
+			result.insert(0, n)
+
+		stack.append(result)
+	elif mode == 4: # str, num
+		stack.append()
+	elif mode == 5: # str, str
+		stack.append()
+	elif mode == 6: # str, list
+		stack.append()
+	elif mode == 8: # list, str
+		stack.append()
+	elif mode == 9: # list, list
+		stack.append()
+	else:
+		dyadNotImplemented(mode, '')
+"""
 # C
 def COperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(-1 if x<y else (1 if x > y else 0))
-	#elif mode == 2: # num, str
+	elif mode == 2 or mode == 4: # num, str; str, num
+		n = str(x if mode == 2 else y)
+		s = y if mode == 2 else x
+
+		stack.append(s.count(n))
 	elif mode == 3: # num, list
 		stack.append(y.count(x))
-	#elif mode == 4: # str, num
 	elif mode == 5: # str, str
 		stack.append(x.count(y))
 	elif mode == 6: # str, list
@@ -1914,11 +1984,16 @@ def EOperator(stack, x, y, mode):
 def EHighDotOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(1 if (x==0 and y==0) or (x % y == 0) else 0)
-	#elif mode == 2: # num, str
+	elif mode == 2: # num, str
+		x = str(x)
+		stack.append(1 if x in y else 0)
 	elif mode == 3: # num, list
 		stack.append(1 if x in y else 0)
-	#elif mode == 4: # str, num
-	#elif mode == 5: # str, str
+	elif mode == 4: # str, num
+		y = str(y)
+		stack.append(1 if y in x else 0)
+	elif mode == 5: # str, str
+		stack.append(1 if y in x else 0)
 	elif mode == 6: # str, list
 		stack.append(1 if x in y else 0)
 	elif mode == 7: # list, num
@@ -1926,7 +2001,7 @@ def EHighDotOperator(stack, x, y, mode):
 	elif mode == 8: # list, str
 		stack.append(1 if y in x else 0)
 	elif mode == 9: # list, list
-		stack.append(1 if x in y else 0)
+		stack.append(1 if y in x else 0)
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -1935,11 +2010,13 @@ def IOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(round(x, y))
 	elif mode == 2: # num, str
-		stack.append()
+		x = str(x)
+		stack.append(y.index(x)+1 if x in y else 0)
 	elif mode == 3: # num, list
 		stack.append(y.index(x)+1 if x in y else 0)
 	elif mode == 4: # str, num
-		stack.append()
+		y = str(y)
+		stack.append(x.index(y)+1 if y in x else 0)
 	elif mode == 5: # str, str
 		stack.append(x.find(y)+1)
 	elif mode == 6: # str, list
@@ -1975,7 +2052,7 @@ def KOperator(stack, x, y, mode):
 		l = y if mode == 3 else x
 
 		def subsets(l, n):
-			if l == [] or n > len(l) or n < 0:
+			if n > len(l) or n < 0:
 				return []
 			elif n == len(l):
 				return [l]
@@ -2127,6 +2204,30 @@ def SOperator(stack, x, y, mode):
 				stack.append([x[:i], x[i+len(y):]])
 				return
 		stack.append(x)
+	else:
+		dyadNotImplemented(mode, '')
+
+# Ṡ
+def SHighDotOperator(stack, x, y, mode):
+	if mode == 1:   # num, num
+		stack.append(utilities.formatNum(x ** (1/y)))
+	elif mode == 2 or mode == 4 or mode == 3 or mode == 7: # num, str; str, num; num, list; list, num
+		n = int(x if mode == 2 or mode == 3 else y)
+		l = y if mode == 2 or mode == 3 else x
+
+		stack.append([l[i:i+n] for i in range(len(l)-n+1)])
+	elif mode == 5 or mode == 9: # str, str; list, list
+		result = []
+		start = 0
+
+		for i in range(len(x)):
+			if x[i] in y:
+				result.append(x[start:i])
+				start = i+1
+		result.append(x[start:])
+		stack.append(result)
+	#elif mode == 6: # str, list
+	#elif mode == 8: # list, str
 	else:
 		dyadNotImplemented(mode, '')
 
@@ -2459,6 +2560,7 @@ ops = {
 	'÷': Operator('÷', 2, divisionOperator),
 	'¤': Operator('¤', 2, currencyOperator),
 	'B': Operator('B', 2, BOperator),
+	#'Ḅ': Operator('Ḅ', 2, BLowDotOperator),
 	'C': Operator('C', 2, COperator),
 	'D': Operator('D', 2, DOperator),
 	'E': Operator('E', 2, EOperator),
@@ -2469,6 +2571,7 @@ ops = {
 	'Ṁ': Operator('Ṁ', 2, MHighDotOperator),
 	'Ṃ': Operator('Ṃ', 2, MLowDotOperator),
 	'S': Operator('S', 2, SOperator),
+	'Ṡ': Operator('Ṡ', 2, SHighDotOperator),
 	'U': Operator('U', 2, UOperator),
 	'Z': Operator('Z', 2, ZOperator)
 
