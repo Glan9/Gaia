@@ -1949,17 +1949,30 @@ def DOperator(stack, x, y, mode):
 def EOperator(stack, x, y, mode):
 	if mode == 1:   # num, num
 		stack.append(x * 10**y)
-	elif mode == 2 or mode == 4 or mode == 3 or mode == 7: # num, str
+	elif mode == 2 or mode == 4: # num, str; str, num
 		n = x if mode < 4 else y
-		s = y if mode < 4 else x
+		s = list(y if mode < 4 else x)
 
 		if len(s) == 0:
 			stack.append(s)
 		else:
 			index = (int(n)-1)%len(s)
 
-			stack.append(s[:index]+s[index+1:])
-			stack.append(s[index])
+			v = s.pop(index)
+			stack.append("".join(s))
+			stack.append(v)
+	elif mode == 3 or mode == 7: # num, list; list, num
+		n = x if mode == 3 else y
+		l = y if mode == 3 else x
+
+		if len(l) == 0:
+			stack.append(l)
+		else:
+			index = (int(n)-1)%len(l)
+
+			v = l.pop(index)
+			stack.append(l)
+			stack.append(v)
 	#elif mode == 5: # str, str
 	#elif mode == 6: # str, list
 	#elif mode == 8: # list, str
@@ -1967,16 +1980,19 @@ def EOperator(stack, x, y, mode):
 		if x == []:
 			stack.append([])
 		else:
-			splits = [int(i)%len(x) for i in y]
-			indices = [(i-1)%len(x) for i in y]
+			x = x[:] # Deep copy x
+			indices = [(int(utilities.castToNumber(i))-1)%len(x) for i in y]
+			result = []
 
-			result = x[:splits[0]-1]
-			for i in range(1,len(splits)):
-				result += x[splits[i-1]:splits[i]-1]
-			result += x[splits[-1]:]
+			for i in indices:
+				result.append(x[i])
+				x[i] = None
 
+			while None in x:
+				x.remove(None)
+
+			stack.append(x)
 			stack.append(result)
-			stack.append([x[i] for i in indices])
 	else:
 		dyadNotImplemented(mode, '')
 

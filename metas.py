@@ -388,7 +388,7 @@ def untilLoop(stack, ops, mode = None, x = None, y = None):
 		else:
 			break
 
-# TODO
+# °
 def untilDoneLoop(stack, ops, mode = None, x = None, y = None):
 	lastValue = None
 
@@ -398,7 +398,7 @@ def untilDoneLoop(stack, ops, mode = None, x = None, y = None):
 			break
 		lastValue = stack[-1]
 
-# TODO
+# º
 def untilDifferentLoop(stack, ops, mode = None, x = None, y = None):
 	lastValue = None
 
@@ -408,7 +408,7 @@ def untilDifferentLoop(stack, ops, mode = None, x = None, y = None):
 			break
 		lastValue = stack[-1]
 
-# TODO
+# ª
 def untilUniqueLoop(stack, ops, mode = None, x = None, y = None):
 	values = []
 
