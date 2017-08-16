@@ -601,8 +601,6 @@ def sOperator(stack, z, mode):
 def tOperator(stack, z, mode):
 	if mode == 1:   # num
 		n = int(z)
-		if n < 4:
-			stack.append([n])
 		p = 0
 		factors = []
 		while n > 1:
