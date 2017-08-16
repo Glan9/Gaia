@@ -409,7 +409,7 @@ def untilDifferentLoop(stack, ops, mode = None, x = None, y = None):
 		lastValue = stack[-1]
 
 # ª
-def untilUniqueLoop(stack, ops, mode = None, x = None, y = None):
+def whileUniqueLoop(stack, ops, mode = None, x = None, y = None):
 	values = []
 
 	while True:
@@ -737,6 +737,9 @@ metas = {
 	'‡': ['‡', 1, 2, cartesian],
 	'↺': ['↺', 2, 0, whileLoop],
 	'↻': ['↻', 2, 0, untilLoop],
+	'°': ['°', 1, 0, untilDoneLoop],
+	'º': ['º', 1, 0, untilDifferentLoop],
+	'ª': ['ª', 1, 0, whileUniqueLoop],
 	'∞': ['∞', 1, 0, infiniteLoop],
 	'∆': ['∆', 1, -1, findIndex],
 	'∇': ['∇', 1, -1, findElement],

@@ -12,6 +12,8 @@ import utilities
 sourcecode = ''
 stack = []
 
+numberRegex = "^-?(\d+(\.\d*)?|\.\d*)|-"
+
 def interpret(code):
 	arrayMarkers = [] # Used to mark the positions of arrays being opened, with '['
 	functions = []
@@ -170,12 +172,16 @@ def interpret(code):
 				func.append(parseString(string, terminator))
 				
 				line = re.sub("^“((\\\\[“”‘’„‟]|[^”‘’„‟])*)([”‘’„‟]|$)", '', line)
-			elif re.match("^-?(\d+(\.\d+)?|\.\d+)", line):
+			elif re.match(numberRegex, line):
 				# Match a number literal
-				match = re.match("^-?(\d+(\.\d+)?|\.\d+)", line).group(0)
+				match = re.match(numberRegex, line).group(0)
+				if match == '-':
+					match = '-1'+match[1:]
+				if match[-1] == '.':
+					match += '5'
 				num = float(match)
 				func.append(operators.Operator(match, 0, ( lambda x: lambda stack: stack.append(utilities.formatNum(x)) )(num) ))
-				line = re.sub("^-?(\d+(\.\d+)?|\.\d+)", '', line)
+				line = re.sub(numberRegex, '', line)
 				if re.match('^[₀₁₂₃₄₅₆₇₈₉]+', line):
 					# Subscript numbers after number literals form another number literal
 					# (so you can write two literals with no separator)
