@@ -12,7 +12,7 @@ import utilities
 sourcecode = ''
 stack = []
 
-numberRegex = "^-?(\d+(\.\d*)?|\.\d*)|-"
+numberRegex = "^-?(\d+(\.\d*)?|\.\d*)|^-"
 
 def interpret(code):
 	arrayMarkers = [] # Used to mark the positions of arrays being opened, with '['

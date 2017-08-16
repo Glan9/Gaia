@@ -786,7 +786,10 @@ def piOperator(stack, z, mode):
 		stack.append(functools.reduce(lambda a,b:a*b, tempStack[0]))
 	#elif mode == 2: # str
 	elif mode == 3: # list
-		stack.append(functools.reduce(lambda a,b:a*b, [utilities.castToNumber(i) for i in utilities.flatten(z)]))
+		if z == []:
+			stack.append(1)
+		else:
+			stack.append(functools.reduce(lambda a,b:a*b, [utilities.castToNumber(i) for i in utilities.flatten(z)]))
 	else:
 		monadNotImplemented(mode, '')
 
