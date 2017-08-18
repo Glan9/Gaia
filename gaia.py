@@ -93,7 +93,7 @@ def interpret(code):
 				strings.append(string[:i])
 				string = string[i+1:]
 				i = 0
-			elif string[i] == '¶' and (terminator=='”' or terminator==''): # Only replace ¶ with newline in a normal text string
+			elif string[i] == '¶':
 				string = string[:i]+"\n"+string[i+1:]
 			i += 1
 		strings.append(string)
@@ -101,7 +101,7 @@ def interpret(code):
 		if terminator == '‘':
 			# Base-250 number
 			for i in range(len(strings)):
-				digits = utilities.codepageEncode(string)
+				digits = utilities.codepageEncode(strings[i])
 				strings[i] = sum((250**i)*digits[~i] for i in range(len(digits)))
 		elif terminator == '’':
 			# List of codepage indices

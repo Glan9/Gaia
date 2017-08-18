@@ -1042,7 +1042,7 @@ def oLowDotOperator(stack, z, mode):
 		stack.append(z.strip())
 	elif mode == 3: # list
 		if len(z) <= 1:
-			stack.append(z)
+			stack.append([])
 		else:
 			stack.append([z[i+1]-z[i] for i in range(len(z)-1)])
 	else:
