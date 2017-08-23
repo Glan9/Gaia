@@ -1,6 +1,6 @@
 # Gaia
 
-A work-in-progress golfing language inspired by [CJam](https://sourceforge.net/projects/cjam/), [Jelly](https://github.com/DennisMitchell/jelly), [Ohm](https://github.com/nickbclifford/Ohm), and [SOGL](https://github.com/dzaima/SOGL).
+A work-in-progress golfing language inspired by [CJam](https://sourceforge.net/projects/cjam/) and [Jelly](https://github.com/DennisMitchell/jelly), and to a lesser extent, [Ohm](https://github.com/nickbclifford/Ohm) and and [SOGL](https://github.com/dzaima/SOGL).
 
 ## Running Gaia
 
